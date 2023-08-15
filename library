@@ -2600,13 +2600,6 @@ function sections:Button(info)
         Visible = page.open
     }, section.visibleContent)
 
-    local button_gradient = utility:Create("Image", {Vector2.new(0,0), button_frame}, {
-        Size = utility:Size(1, 0, 1, 0, button_frame),
-        Position = utility:Position(0, 0, 0 , 0, button_frame),
-        Transparency = 0.5,
-        Visible = page.open
-    }, section.visibleContent)
-
     local button_title = utility:Create("TextLabel", {Vector2.new(button_frame.Size.X/2,1), button_frame}, {
         Text = name,
         Size = theme.textsize,
@@ -2668,7 +2661,6 @@ function sections:Button(info)
 
     return button
 end
-
     --
     function sections:ButtonHolder(info)
         local info = info or {}
