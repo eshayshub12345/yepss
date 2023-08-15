@@ -2597,6 +2597,15 @@ function sections:Button(info)
         Visible = page.open
     }, section.visibleContent)
 
+    local clickIndicator = utility:Create("Frame", {Vector2.new(button_frame.Size.X, button_frame.Size.Y), button_frame}, {
+        Size = utility:Size(1, 0, 1, 0, button_frame),
+        Position = utility:Position(0, 0, 0, 0, button_frame),
+        BackgroundTransparency = 0.5,
+        BackgroundColor3 = Color3.fromRGB(0, 255, 0), -- Green color for the click indicator
+        Visible = false,
+        ZIndex = 5
+    }, section.visibleContent)
+
     local function createRipple(center)
         local rippleSize = button_frame.Size.X > button_frame.Size.Y and button_frame.Size.X or button_frame.Size.Y
         local ripple = utility:Create("Frame", {Vector2.new(rippleSize, rippleSize), button_frame}, {
@@ -2625,6 +2634,11 @@ function sections:Button(info)
             createRipple(clickPosition)
 
             callback()
+
+            -- Show the click indicator
+            clickIndicator.Visible = true
+            wait(0.2) -- Wait for a short duration
+            clickIndicator.Visible = false -- Hide the click indicator
         end
     end
 
