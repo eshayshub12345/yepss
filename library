@@ -2567,7 +2567,7 @@ end
         return slider
     end
     --
-  function sections:Button(info)
+function sections:Button(info)
     local info = info or {}
     local name = info.name or info.Name or info.title or info.Title or "New Button"
     local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
@@ -2618,23 +2618,19 @@ end
         Visible = page.open
     }, section.visibleContent)
 
-    local ripple = utility:Create("Frame", {Vector2.new(button_frame.Size.X, button_frame.Size.Y), button_frame}, {
-        Size = utility:Size(1, 0, 1, 0, button_frame),
-        Position = utility:Position(0, 0, 0, 0, button_frame),
-        BackgroundTransparency = 0.5,
-        BackgroundColor3 = theme.accent,
-        Visible = false,
-        ZIndex = 10
-    }, section.visibleContent)
-
     local function createRipple(center)
-        ripple.Position = UDim2.new(0, center.X, 0, center.Y)
-        ripple.Size = UDim2.new(0, 0, 0, 0)
-        ripple.Visible = true
+        local rippleSize = button_frame.Size.X > button_frame.Size.Y and button_frame.Size.X or button_frame.Size.Y
+        local ripple = utility:Create("Frame", {Vector2.new(rippleSize, rippleSize), button_frame}, {
+            Size = utility:Size(1, 0, 1, 0, button_frame),
+            Position = utility:Position(0.5, -rippleSize / 2, 0.5, -rippleSize / 2, button_frame),
+            BackgroundColor3 = theme.accent,
+            Visible = true,
+            ZIndex = 10
+        }, section.visibleContent)
 
         local rippleTween = game:GetService("TweenService"):Create(ripple, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, button_frame.Size.X * 2, 0, button_frame.Size.Y * 2),
-            Position = UDim2.new(0.5, -button_frame.Size.X, 0.5, -button_frame.Size.Y)
+            Size = UDim2.new(0, rippleSize * 2, 0, rippleSize * 2),
+            Position = UDim2.new(0.5, -rippleSize, 0.5, -rippleSize)
         })
 
         rippleTween:Play()
@@ -2672,6 +2668,7 @@ end
 
     return button
 end
+
     --
     function sections:ButtonHolder(info)
         local info = info or {}
