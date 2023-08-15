@@ -2579,10 +2579,31 @@ function sections:Button(info)
 
     local button = { axis = section.currentAxis }
 
-    local button_frame = utility:Create("Frame", { Vector2.new(4, button.axis), section.section_frame }, {
+    local button_outline = utility:Create("Frame", { Vector2.new(4, button.axis), section.section_frame }, {
         Size = utility:Size(1, -8, 0, 20, section.section_frame),
         Position = utility:Position(0, 4, 0, button.axis, section.section_frame),
+        Color = theme.outline,
+        Visible = page.open
+    }, section.visibleContent)
+
+    local button_inline = utility:Create("Frame", { Vector2.new(1, 1), button_outline }, {
+        Size = utility:Size(1, -2, 1, -2, button_outline),
+        Position = utility:Position(0, 1, 0, 1, button_outline),
+        Color = theme.inline,
+        Visible = page.open
+    }, section.visibleContent)
+
+    local button_frame = utility:Create("Frame", { Vector2.new(1, 1), button_inline }, {
+        Size = utility:Size(1, -2, 1, -2, button_inline),
+        Position = utility:Position(0, 1, 0, 1, button_inline),
         Color = theme.light_contrast,
+        Visible = page.open
+    }, section.visibleContent)
+
+    local button_gradient = utility:Create("Image", { Vector2.new(0, 0), button_frame }, {
+        Size = utility:Size(1, 0, 1, 0, button_frame),
+        Position = utility:Position(0, 0, 0, 0, button_frame),
+        Transparency = 0.5,
         Visible = page.open
     }, section.visibleContent)
 
@@ -2604,7 +2625,7 @@ function sections:Button(info)
             BackgroundTransparency = 0.5,
             BackgroundColor3 = theme.accent,
             Visible = true,
-            ZIndex = 10
+            ZIndex = button_frame.ZIndex + 1
         }, section.visibleContent)
 
         local rippleTween = game:GetService("TweenService"):Create(ripple, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
@@ -2619,11 +2640,9 @@ function sections:Button(info)
         end)
     end
 
-    button_frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            createRipple(Vector2.new(button_frame.AbsoluteSize.X / 2, button_frame.AbsoluteSize.Y / 2))
-            callback()
-        end
+    button_frame.MouseButton1Click:Connect(function()
+        createRipple(Vector2.new(button_frame.AbsoluteSize.X / 2, button_frame.AbsoluteSize.Y / 2))
+        callback()
     end)
 
     button_frame.MouseEnter:Connect(function()
@@ -2644,6 +2663,7 @@ function sections:Button(info)
 
     return button
 end
+
 
     --
     function sections:ButtonHolder(info)
