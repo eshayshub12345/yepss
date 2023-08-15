@@ -2619,9 +2619,11 @@ function sections:Button(info)
         end)
     end
 
-    button_frame.MouseButton1Click:Connect(function()
-        createRipple(Vector2.new(button_frame.AbsoluteSize.X / 2, button_frame.AbsoluteSize.Y / 2))
-        callback()
+    button_frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            createRipple(Vector2.new(button_frame.AbsoluteSize.X / 2, button_frame.AbsoluteSize.Y / 2))
+            callback()
+        end
     end)
 
     button_frame.MouseEnter:Connect(function()
@@ -2642,6 +2644,7 @@ function sections:Button(info)
 
     return button
 end
+
     --
     function sections:ButtonHolder(info)
         local info = info or {}
