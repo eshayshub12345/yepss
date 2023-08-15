@@ -2598,13 +2598,10 @@ function sections:Button(info)
     }, section.visibleContent)
 
     local function createRipple(clickPosition)
-        local ripple = utility:Create("ImageLabel", {Vector2.new(0, 0), button_frame}, {
+        local ripple = utility:Create("Frame", {Vector2.new(0, 0), button_frame}, {
             Size = UDim2.new(0, 0, 0, 0),
             Position = UDim2.new(0, clickPosition.X, 0, clickPosition.Y),
-            BackgroundTransparency = 1,
-            Image = "rbxassetid://358862423",
-            ImageColor3 = theme.accent,
-            ImageTransparency = 0.5,
+            BackgroundColor3 = theme.accent,
             Visible = true,
             ZIndex = 10
         }, section.visibleContent)
@@ -2612,7 +2609,7 @@ function sections:Button(info)
         local rippleTween = game:GetService("TweenService"):Create(ripple, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, button_frame.Size.X, 0, button_frame.Size.Y),
             Position = UDim2.new(0.5, -button_frame.Size.X/2, 0.5, -button_frame.Size.Y/2),
-            ImageTransparency = 1
+            BackgroundTransparency = 1
         })
 
         rippleTween:Play()
@@ -2650,6 +2647,7 @@ function sections:Button(info)
 
     return button
 end
+
 
 
     --
