@@ -2618,25 +2618,19 @@ function sections:Button(info)
         end)
     end
 
-    library.began[#library.began + 1] = function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1 and button_frame.Visible and window.isVisible and not window:IsOverContent() then
-            local clickPosition = Vector2.new(Input.Position.X - button_frame.AbsolutePosition.X, Input.Position.Y - button_frame.AbsolutePosition.Y)
-            createRipple(clickPosition)
+    button_frame.MouseButton1Click:Connect(function()
+        createRipple(Vector2.new(button_frame.AbsoluteSize.X/2, button_frame.AbsoluteSize.Y/2))
+        callback()
+    end)
 
-            callback()
-        end
-    end
+    button_frame.MouseEnter:Connect(function()
+        local h, s, v = theme.accent:ToHSV()
+        button_frame.Color = Color3.fromHSV(h, 0.44, v)
+    end)
 
-    library.changed[#library.changed + 1] = function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseMovement and button_frame.Visible and window.isVisible then
-            if utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + button.axis + 20}) and not window:IsOverContent() then
-                local h, s, v = theme.accent:ToHSV()
-                button_frame.Color = Color3.fromHSV(h, 0.44, v)
-            else
-                button_frame.Color = theme.light_contrast
-            end
-        end
-    end
+    button_frame.MouseLeave:Connect(function()
+        button_frame.Color = theme.light_contrast
+    end)
 
     if pointer and tostring(pointer) ~= "" and tostring(pointer) ~= " " and not library.pointers[tostring(pointer)] then
         library.pointers[tostring(pointer)] = button
@@ -2647,8 +2641,6 @@ function sections:Button(info)
 
     return button
 end
-
-
 
     --
     function sections:ButtonHolder(info)
