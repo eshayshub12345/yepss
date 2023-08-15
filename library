@@ -2612,10 +2612,12 @@ function sections:Button(info)
     }, section.visibleContent)
     
     -- Apply the shadow effect
-    local shadow = utility:Create("Frame", {Vector2.new(0,0), button_frame}, {
+    local shadow = utility:Create("ImageLabel", {Vector2.new(0,0), button_frame}, {
         Size = utility:Size(1, 10, 1, 10, button_frame),
         Position = utility:Position(0, -5, 0, -5, button_frame),
-        BackgroundColor3 = Color3.new(0, 0, 0),  -- Shadow color
+        Image = "rbxassetid://2708891598",  -- Shadow image asset
+        ImageTransparency = 0.8,
+        BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Visible = false
     }, button_frame)
