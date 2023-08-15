@@ -2647,10 +2647,7 @@ end
         return button
     end
     --
-
-
-    --
-function sections:Button(info)
+    function sections:Button(info)
     local info = info or {}
     local name = info.name or info.Name or info.title or info.Title or "New Button"
     local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
@@ -2701,7 +2698,6 @@ function sections:Button(info)
         Visible = page.open
     }, section.visibleContent)
 
-
     local function createRipple(clickPosition)
         local ripple = utility:Create("Frame", {Vector2.new(0, 0), button_frame}, {
             Size = UDim2.new(0, 0, 0, 0),
@@ -2744,6 +2740,7 @@ function sections:Button(info)
 
     section.currentAxis = section.currentAxis + 20 + 4
     section:Update()
+end
 
     --
     function sections:Textbox(info)
