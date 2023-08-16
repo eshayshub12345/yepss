@@ -2624,9 +2624,7 @@ end
             if Input.UserInputType == Enum.UserInputType.MouseButton1 and button_outline.Visible and window.isVisible and utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + button.axis + 20}) and not window:IsOverContent() then
                 callback()
 		button_frame.Color = Color3.new(1, 1, 1)
-	        wait(0.05)  -- Wait for 0.5 seconds
-	
-	        
+	        wait(0.05)  
 	        button_frame.Color = theme.light_contrast
 		end
 	end
