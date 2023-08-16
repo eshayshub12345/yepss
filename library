@@ -2649,7 +2649,7 @@ end
         return button
     end
     --
-    function sections:ButtonHolder(info)
+function sections:ButtonHolder(info)
     local info = info or {}
     local buttons = info.buttons or info.Buttons or {}
     --
@@ -2703,23 +2703,11 @@ end
         --
         --utility:LoadImage(button_gradient, "gradient", "https://i.imgur.com/5hmlrjX.png")
         --
+        local rippleEffect = MouseClickEffect.AddEffect(button_frame, Utility.MousePosition, 0.6)
         library.began[#library.began + 1] = function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 and button_outline.Visible and window.isVisible and utility:MouseOverDrawing({section.section_frame.Position.X + (i == 2 and (section.section_frame.Size.X/2) or 0), section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X - (i == 1 and (section.section_frame.Size.X/2) or 0), section.section_frame.Position.Y + button.axis + 20}) and not window:IsOverContent() then
                 buttons[i][2]()
-                local mouseX, mouseY = Input.Position.X, Input.Position.Y
-                local buttonBounds = {
-                    minX = section.section_frame.Position.X + (i == 2 and (section.section_frame.Size.X/2) or 0),
-                    minY = section.section_frame.Position.Y + button.axis,
-                    maxX = section.section_frame.Position.X + section.section_frame.Size.X - (i == 1 and (section.section_frame.Size.X/2) or 0),
-                    maxY = section.section_frame.Position.Y + button.axis + 20
-                }
-                local ripple = {
-                    startTime = tick(),
-                    startPos = Vector2.new(mouseX - buttonBounds.minX, mouseY - buttonBounds.minY),
-                    size = 0,
-                    maxRadius = math.sqrt((buttonBounds.maxX - buttonBounds.minX)^2 + (buttonBounds.maxY - buttonBounds.minY)^2),
-                }
-                table.insert(rippleCircles, ripple)
+                rippleEffect()
             end
         end
         --
@@ -2736,6 +2724,7 @@ end
     section.currentAxis = section.currentAxis + 20 + 4
     section:Update()
 end
+
 
     function sections:Textbox(info)
         local info = info or {}
