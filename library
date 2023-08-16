@@ -2623,7 +2623,7 @@ end
         library.began[#library.began + 1] = function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 and button_outline.Visible and window.isVisible and utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + button.axis + 20}) and not window:IsOverContent() then
                 callback()
-		local whiteColor = Color3.new(255, 255, 255)
+		local whiteColor = Color3.new(1, 1, 1)
         local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 
         local tween = game:GetService("TweenService"):Create(button_frame, tweenInfo, {BackgroundColor3 = whiteColor})
