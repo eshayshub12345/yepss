@@ -2570,6 +2570,7 @@ end
 function sections:Button(info)
     local info = info or {}
     local name = info.name or info.Name or info.title or info.Title or "New Button"
+    local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
     local callback = info.callback or info.callBack or info.Callback or info.CallBack or function() end
 
     local window = self.window
@@ -2631,27 +2632,12 @@ function sections:Button(info)
     button_frame.MouseLeave:Connect(revertHoverEffect)
 
     button_frame.MouseButton1Click:Connect(function()
-        createRipple(Vector2.new(button_frame.AbsolutePosition.X, button_frame.AbsolutePosition.Y))
-        callback()
+        pcall(callback)
+        createRipple()
     end)
 
-    library.began[#library.began + 1] = function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1 and button_frame.Visible and window.isVisible and not window:IsOverContent() then
-            local clickPosition = Vector2.new(Input.Position.X - button_frame.AbsolutePosition.X, Input.Position.Y - button_frame.AbsolutePosition.Y)
-            createRipple(clickPosition)
-
-            callback()
-        end
-    end
-
-    library.changed[#library.changed + 1] = function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseMovement and button_frame.Visible and window.isVisible then
-            if utility:MouseOverDrawing({ section.section_frame.Position.X, section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + button.axis + 20 }) and not window:IsOverContent() then
-                applyHoverEffect()
-            else
-                revertHoverEffect()
-            end
-        end
+    if pointer and tostring(pointer) ~= "" and tostring(pointer) ~= " " and not library.pointers[tostring(pointer)] then
+        library.pointers[tostring(pointer)] = button
     end
 
     section.currentAxis = section.currentAxis + 20 + 4
@@ -2743,29 +2729,29 @@ end
             button_inline.Color = theme.inline
         end
 
-        button_outline.MouseEnter:Connect(applyHoverEffect)
-        button_outline.MouseLeave:Connect(revertHoverEffect)
+        local function onMouseEnter()
+            applyHoverEffect()
+        end
 
-        button_outline.MouseButton1Click:Connect(function()
+        local function onMouseLeave()
+            revertHoverEffect()
+        end
+
+        local function onMouseClick()
             if button_outline.Visible and window.isVisible and utility:MouseOverDrawing({ section.section_frame.Position.X + (i == 2 and (section.section_frame.Size.X / 2) or 0), section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X - (i == 1 and (section.section_frame.Size.X / 2) or 0), section.section_frame.Position.Y + button.axis + 20 }) and not window:IsOverContent() then
                 buttons[i][2]()
             end
-        end)
-
-        library.changed[#library.changed + 1] = function(Input)
-            if Input.UserInputType == Enum.UserInputType.MouseMovement and button_outline.Visible and window.isVisible then
-                if utility:MouseOverDrawing({ section.section_frame.Position.X + (i == 2 and (section.section_frame.Size.X / 2) or 0), section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X - (i == 1 and (section.section_frame.Size.X / 2) or 0), section.section_frame.Position.Y + button.axis + 20 }) and not window:IsOverContent() then
-                    applyHoverEffect()
-                else
-                    revertHoverEffect()
-                end
-            end
         end
+
+        button_outline.MouseEnter:Connect(onMouseEnter)
+        button_outline.MouseLeave:Connect(onMouseLeave)
+        button_outline.MouseButton1Click:Connect(onMouseClick)
     end
 
     section.currentAxis = section.currentAxis + 20 + 4
     section:Update()
 end
+
     --
     function sections:Textbox(info)
         local info = info or {}
