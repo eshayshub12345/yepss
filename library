@@ -2623,17 +2623,27 @@ end
         library.began[#library.began + 1] = function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 and button_outline.Visible and window.isVisible and utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + button.axis + 20}) and not window:IsOverContent() then
                 callback()
-		local whiteColor = Color3.new(1, 1, 1)
-        local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+	local targetColor = Color3.new(1, 1, 1)  -- Whitish color
+        local originalColor = button_frame.BackgroundColor3
+        local steps = 10  -- Number of steps for the color change
+        local delay = 0.05  -- Delay between each step (adjust for smoother/faster animation)
 
-        local tween = game:GetService("TweenService"):Create(button_frame, tweenInfo, {BackgroundColor3 = whiteColor})
-        tween:Play()
+        local stepR = (targetColor.r - originalColor.r) / steps
+        local stepG = (targetColor.g - originalColor.g) / steps
+        local stepB = (targetColor.b - originalColor.b) / steps
+
+        for step = 1, steps do
+            local newColor = Color3.new(
+                originalColor.r + stepR * step,
+                originalColor.g + stepG * step,
+                originalColor.b + stepB * step
+            )
+            button_frame.BackgroundColor3 = newColor
+            wait(delay)
+        end
 
         -- Restore the original color
-        local restoreTween = game:GetService("TweenService"):Create(button_frame, tweenInfo, {BackgroundColor3 = theme.light_contrast})
-        restoreTween:Play()
-            end
-        end
+        button_frame.BackgroundColor3 = originalColor
         --
         library.changed[#library.changed + 1] = function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseMovement and button_outline.Visible and window.isVisible then
