@@ -2571,22 +2571,22 @@ function sections:Button(info)
     local info = info or {}
     local name = info.name or info.Name or info.title or info.Title or "New Button"
     local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
-    local callback = info.callback or info.callBack or info.Callback or info.CallBack or function() end
+    local callback = info.callback or info.callBack or info.Callback or info.CallBack or function()end
 
     local window = self.window
     local page = self.page
     local section = self
 
-    local button = { axis = section.currentAxis }
+    local button = {axis = section.currentAxis}
 
-    local button_frame = utility:Create("Frame", { Vector2.new(4, button.axis), section.section_frame }, {
+    local button_frame = utility:Create("Frame", {Vector2.new(4, button.axis), section.section_frame}, {
         Size = utility:Size(1, -8, 0, 20, section.section_frame),
         Position = utility:Position(0, 4, 0, button.axis, section.section_frame),
         Color = theme.light_contrast,
         Visible = page.open
     }, section.visibleContent)
 
-    local button_title = utility:Create("TextLabel", { Vector2.new(button_frame.Size.X / 2, 1), button_frame }, {
+    local button_title = utility:Create("TextLabel", {Vector2.new(button_frame.Size.X/2,1), button_frame}, {
         Text = name,
         Size = theme.textsize,
         Font = theme.font,
@@ -2597,35 +2597,20 @@ function sections:Button(info)
         Visible = page.open
     }, section.visibleContent)
 
-    local function createRipple(center)
-        local rippleSize = button_frame.Size.X > button_frame.Size.Y and button_frame.Size.X or button_frame.Size.Y
-        local ripple = utility:Create("Frame", { Vector2.new(rippleSize, rippleSize), button_frame }, {
-            Size = utility:Size(1, 0, 1, 0, button_frame),
-            Position = utility:Position(0.5, -rippleSize / 2, 0.5, -rippleSize / 2, button_frame),
-            BackgroundTransparency = 0.5,
-            BackgroundColor3 = theme.accent,
-            Visible = true,
-            ZIndex = 10
-        }, section.visibleContent)
-
-        local rippleTween = game:GetService("TweenService"):Create(ripple, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, rippleSize * 2, 0, rippleSize * 2),
-            Position = UDim2.new(0.5, -rippleSize, 0.5, -rippleSize)
-        })
-
-        rippleTween:Play()
-        rippleTween.Completed:Connect(function()
-            ripple:Destroy()
-        end)
-    end
-
     local function applyHoverEffect()
-        local h, s, v = theme.accent:ToHSV()
-        button_frame.Color = Color3.fromHSV(h, 0.44, v)
+        TweenService:Create(
+            button_frame,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(103, 123, 196)}
+        ):Play()
     end
 
     local function revertHoverEffect()
-        button_frame.Color = theme.light_contrast
+        TweenService:Create(
+            button_frame,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(114, 137, 228)}
+        ):Play()
     end
 
     button_frame.MouseEnter:Connect(applyHoverEffect)
@@ -2633,7 +2618,12 @@ function sections:Button(info)
 
     button_frame.MouseButton1Click:Connect(function()
         pcall(callback)
-        createRipple()
+        button_frame.TextSize = 0
+        TweenService:Create(
+            button_frame,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {TextSize = 14}
+        ):Play()
     end)
 
     if pointer and tostring(pointer) ~= "" and tostring(pointer) ~= " " and not library.pointers[tostring(pointer)] then
@@ -2645,6 +2635,7 @@ function sections:Button(info)
 
     return button
 end
+
     --
     function sections:ButtonHolder(info)
     local info = info or {}
@@ -2654,103 +2645,69 @@ end
     local page = self.page
     local section = self
 
-    local buttonHolder = { buttons = {} }
+    local buttonHolder = {buttons = {}}
 
-    for i = 1, 2 do
-        local button = { axis = section.currentAxis }
+    for i = 1, #buttons do
+        local button = buttons[i]
+        local axis = section.currentAxis
 
-        local button_outline = utility:Create("Frame", { Vector2.new(i == 2 and ((section.section_frame.Size.X / 2) + 2) or 4, button.axis), section.section_frame }, {
+        local button_frame = utility:Create("Frame", { Vector2.new(button.size, axis), section.section_frame }, {
             Size = utility:Size(0.5, -6, 0, 20, section.section_frame),
-            Position = utility:Position(0, i == 2 and 2 or 4, 0, button.axis, section.section_frame),
+            Position = utility:Position(0, button.position, 0, axis, section.section_frame),
             Color = theme.outline,
             Visible = page.open
         }, section.visibleContent)
 
-        local button_inline = utility:Create("Frame", { Vector2.new(1, 1), button_outline }, {
-            Size = utility:Size(1, -2, 1, -2, button_outline),
-            Position = utility:Position(0, 1, 0, 1, button_outline),
+        local button_inline = utility:Create("Frame", { Vector2.new(1, 1), button_frame }, {
+            Size = utility:Size(1, -2, 1, -2, button_frame),
+            Position = utility:Position(0, 1, 0, 1, button_frame),
             Color = theme.inline,
             Visible = page.open
         }, section.visibleContent)
 
-        local button_frame = utility:Create("Frame", { Vector2.new(1, 1), button_inline }, {
+        local button_frame_content = utility:Create("Frame", { Vector2.new(1, 1), button_inline }, {
             Size = utility:Size(1, -2, 1, -2, button_inline),
             Position = utility:Position(0, 1, 0, 1, button_inline),
             Color = theme.light_contrast,
             Visible = page.open
         }, section.visibleContent)
 
-        local button_gradient = utility:Create("Image", { Vector2.new(0, 0), button_frame }, {
-            Size = utility:Size(1, 0, 1, 0, button_frame),
-            Position = utility:Position(0, 0, 0, 0, button_frame),
-            Transparency = 0.5,
-            Visible = page.open
-        }, section.visibleContent)
-
-        local button_title = utility:Create("TextLabel", { Vector2.new(button_frame.Size.X / 2, 1), button_frame }, {
-            Text = buttons[i][1],
+        local button_title = utility:Create("TextLabel", { Vector2.new(button_frame_content.Size.X / 2, 1), button_frame_content }, {
+            Text = button.text,
             Size = theme.textsize,
             Font = theme.font,
             Color = theme.textcolor,
             OutlineColor = theme.textborder,
             Center = true,
-            Position = utility:Position(0.5, 0, 0, 1, button_frame),
+            Position = utility:Position(0.5, 0, 0, 1, button_frame_content),
             Visible = page.open
         }, section.visibleContent)
 
-        local function createRipple(center)
-            local rippleSize = button_frame.Size.X > button_frame.Size.Y and button_frame.Size.X or button_frame.Size.Y
-            local ripple = utility:Create("Frame", { Vector2.new(rippleSize, rippleSize), button_frame }, {
-                Size = utility:Size(1, 0, 1, 0, button_frame),
-                Position = utility:Position(0.5, -rippleSize / 2, 0.5, -rippleSize / 2, button_frame),
-                BackgroundTransparency = 0.5,
-                BackgroundColor3 = theme.accent,
-                Visible = true,
-                ZIndex = 10
-            }, section.visibleContent)
-
-            local rippleTween = game:GetService("TweenService"):Create(ripple, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                Size = UDim2.new(0, rippleSize * 2, 0, rippleSize * 2),
-                Position = UDim2.new(0.5, -rippleSize, 0.5, -rippleSize)
-            })
-
-            rippleTween:Play()
-            rippleTween.Completed:Connect(function()
-                ripple:Destroy()
-            end)
-        end
-
         local function applyHoverEffect()
-            local h, s, v = theme.accent:ToHSV()
-            button_inline.Color = Color3.fromHSV(h, 0.44, v)
+            local h, s, v = Color3.fromRGB(103, 123, 196):ToHSV()
+            button_frame.Color = Color3.fromHSV(h, 0.44, v)
         end
 
         local function revertHoverEffect()
-            button_inline.Color = theme.inline
+            button_frame.Color = theme.outline
         end
 
-        local function onMouseEnter()
-            applyHoverEffect()
+        button_frame.MouseEnter:Connect(applyHoverEffect)
+        button_frame.MouseLeave:Connect(revertHoverEffect)
+
+        button_frame.MouseButton1Click:Connect(function()
+            button.callback()
+        end)
+
+        if button.pointer and tostring(button.pointer) ~= "" and tostring(button.pointer) ~= " " and not library.pointers[tostring(button.pointer)] then
+            library.pointers[tostring(button.pointer)] = button
         end
 
-        local function onMouseLeave()
-            revertHoverEffect()
-        end
-
-        local function onMouseClick()
-            if button_outline.Visible and window.isVisible and utility:MouseOverDrawing({ section.section_frame.Position.X + (i == 2 and (section.section_frame.Size.X / 2) or 0), section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X - (i == 1 and (section.section_frame.Size.X / 2) or 0), section.section_frame.Position.Y + button.axis + 20 }) and not window:IsOverContent() then
-                buttons[i][2]()
-            end
-        end
-
-        button_outline.MouseEnter:Connect(onMouseEnter)
-        button_outline.MouseLeave:Connect(onMouseLeave)
-        button_outline.MouseButton1Click:Connect(onMouseClick)
+        section.currentAxis = axis + 20 + 4
+        section:Update()
     end
-
-    section.currentAxis = section.currentAxis + 20 + 4
-    section:Update()
 end
+
 
     --
     function sections:Textbox(info)
