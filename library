@@ -2622,34 +2622,7 @@ function sections:Button(info)
     --
     -- utility:LoadImage(button_gradient, "gradient", "https://i.imgur.com/5hmlrjX.png")
     --
-library.began[#library.began + 1] = function(Input)
-    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-        local mouseX, mouseY = Input.Position.X, Input.Position.Y
-        local buttonBounds = {
-            minX = section.section_frame.Position.X,
-            minY = section.section_frame.Position.Y + button.axis,
-            maxX = section.section_frame.Position.X + section.section_frame.Size.X,
-            maxY = section.section_frame.Position.Y + button.axis + 20
-        }
-        
-        if utility:MouseOverDrawing(buttonBounds) and not window:IsOverContent() then
-            -- Create ripple circle data and start animation
-            local ripple = {
-                startTime = tick(),
-                startPos = Vector2.new(mouseX - buttonBounds.minX, mouseY - buttonBounds.minY),
-                size = 0,
-                maxRadius = math.sqrt((buttonBounds.maxX - buttonBounds.minX)^2 + (buttonBounds.maxY - buttonBounds.minY)^2),
-            }
-            table.insert(rippleCircles, ripple)
-            
-            callback()
-        end
-    end
-end
-
-library.changed[#library.changed + 1] = function(Input)
-    local mouseX, mouseY = Input.Position.X, Input.Position.Y
-    
+library.changed[#library.changed + 1] = function()
     for i, ripple in ipairs(rippleCircles) do
         local elapsedTime = tick() - ripple.startTime
         ripple.size = elapsedTime * 100
@@ -2663,6 +2636,7 @@ library.changed[#library.changed + 1] = function(Input)
     end
     
     -- Highlight button on mouse hover
+    local mouseX, mouseY = mouse.X, mouse.Y
     local buttonBounds = {
         minX = section.section_frame.Position.X,
         minY = section.section_frame.Position.Y + button.axis,
@@ -2677,6 +2651,7 @@ library.changed[#library.changed + 1] = function(Input)
         button_inline.Color = theme.inline
     end
 end
+
 
     
     if pointer and tostring(pointer) ~= "" and tostring(pointer) ~= " " and not library.pointers[tostring(pointer)] then
