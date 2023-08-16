@@ -2623,20 +2623,29 @@ end
         library.began[#library.began + 1] = function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 and button_outline.Visible and window.isVisible and utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + button.axis + 20}) and not window:IsOverContent() then
                 callback()
-		local whitishColor = Color3.new(1, 1, 1)  -- Whitish color
+		 local whitishColor = Color3.new(1, 1, 1)  -- Whitish color
 
-	        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-	        local tween = game:GetService("TweenService"):Create(button_frame, tweenInfo, {BackgroundColor3 = whitishColor})
-	
-	        tween:Play()
-	
-	        wait(0.5)  -- Wait for the whitish color duration
-	
-	        -- Restore the original color
-	        local restoreTween = game:GetService("TweenService"):Create(button_frame, tweenInfo, {BackgroundColor3 = theme.light_contrast})
-	        restoreTween:Play()
-	            end
-        end
+        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        local rippleFrame = button_inline:Clone()
+        rippleFrame.Parent = button_frame
+        rippleFrame.BackgroundTransparency = 0
+        rippleFrame.Size = UDim2.new(1, 0, 1, 0)
+        rippleFrame.Position = UDim2.new(0, 0, 0, 0)
+        rippleFrame.ZIndex = rippleFrame.ZIndex + 1
+        local tween = game:GetService("TweenService"):Create(rippleFrame, tweenInfo, {BackgroundColor3 = whitishColor, Size = UDim2.new(3, 0, 3, 0), Position = UDim2.new(-1, 0, -1, 0)})
+
+        tween:Play()
+
+        wait(0.5)  -- Wait for the whitish color duration
+
+        -- Restore the original color and size
+        local restoreTween = game:GetService("TweenService"):Create(rippleFrame, tweenInfo, {BackgroundColor3 = theme.light_contrast, Size = UDim2.new(1, 0, 1, 0), Position = UDim2.new(0, 0, 0, 0)})
+        restoreTween:Play()
+        restoreTween.Completed:Connect(function()
+            rippleFrame:Destroy()
+	        end)
+	    end
+	end
         --
         library.changed[#library.changed + 1] = function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseMovement and button_outline.Visible and window.isVisible then
@@ -2717,20 +2726,29 @@ end
     if Input.UserInputType == Enum.UserInputType.MouseButton1 and button_outline.Visible and window.isVisible and utility:MouseOverDrawing({section.section_frame.Position.X + (i == 2 and (section.section_frame.Size.X/2) or 0), section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X - (i == 1 and (section.section_frame.Size.X/2) or 0), section.section_frame.Position.Y + button.axis + 20}) and not window:IsOverContent() then
         buttons[i][2]()
 
-        local whitishColor = Color3.new(1, 1, 1)  -- Whitish color
+        		 local whitishColor = Color3.new(1, 1, 1)  -- Whitish color
 
         local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-        local tween = game:GetService("TweenService"):Create(button_frame, tweenInfo, {BackgroundColor3 = whitishColor})
+        local rippleFrame = button_inline:Clone()
+        rippleFrame.Parent = button_frame
+        rippleFrame.BackgroundTransparency = 0
+        rippleFrame.Size = UDim2.new(1, 0, 1, 0)
+        rippleFrame.Position = UDim2.new(0, 0, 0, 0)
+        rippleFrame.ZIndex = rippleFrame.ZIndex + 1
+        local tween = game:GetService("TweenService"):Create(rippleFrame, tweenInfo, {BackgroundColor3 = whitishColor, Size = UDim2.new(3, 0, 3, 0), Position = UDim2.new(-1, 0, -1, 0)})
 
         tween:Play()
 
         wait(0.5)  -- Wait for the whitish color duration
 
-        -- Restore the original color
-        local restoreTween = game:GetService("TweenService"):Create(button_frame, tweenInfo, {BackgroundColor3 = theme.light_contrast})
+        -- Restore the original color and size
+        local restoreTween = game:GetService("TweenService"):Create(rippleFrame, tweenInfo, {BackgroundColor3 = theme.light_contrast, Size = UDim2.new(1, 0, 1, 0), Position = UDim2.new(0, 0, 0, 0)})
         restoreTween:Play()
-    end
-end
+        restoreTween.Completed:Connect(function()
+            rippleFrame:Destroy()
+	        end)
+	    end
+	end
             library.changed[#library.changed + 1] = function(Input)
                 if Input.UserInputType == Enum.UserInputType.MouseMovement and button_outline.Visible and window.isVisible then
                     if utility:MouseOverDrawing({section.section_frame.Position.X + (i == 2 and (section.section_frame.Size.X/2) or 0), section.section_frame.Position.Y + button.axis, section.section_frame.Position.X + section.section_frame.Size.X - (i == 1 and (section.section_frame.Size.X/2) or 0), section.section_frame.Position.Y + button.axis + 20}) and not window:IsOverContent() then
