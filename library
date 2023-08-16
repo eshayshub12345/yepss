@@ -2570,7 +2570,6 @@ end
 function sections:Button(info)
     local info = info or {}
     local name = info.name or info.Name or info.title or info.Title or "New Button"
-    local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
     local callback = info.callback or info.callBack or info.Callback or info.CallBack or function()end
 
     local window = self.window
@@ -2579,38 +2578,32 @@ function sections:Button(info)
 
     local button = {axis = section.currentAxis}
 
-    local button_frame = utility:Create("Frame", {Vector2.new(4, button.axis), section.section_frame}, {
-        Size = utility:Size(1, -8, 0, 20, section.section_frame),
-        Position = utility:Position(0, 4, 0, button.axis, section.section_frame),
-        Color = theme.light_contrast,
-        Visible = page.open
-    }, section.visibleContent)
+    local button_frame = Instance.new("TextButton")
+    button_frame.Name = "ButtonFrame"
+    button_frame.Size = UDim2.new(1, -8, 0, 20)
+    button_frame.Position = UDim2.new(0, 4, 0, button.axis)
+    button_frame.BackgroundColor3 = theme.light_contrast
+    button_frame.Visible = page.open
+    button_frame.Parent = section.visibleContent
 
-    local button_title = utility:Create("TextLabel", {Vector2.new(button_frame.Size.X/2,1), button_frame}, {
-        Text = name,
-        Size = theme.textsize,
-        Font = theme.font,
-        Color = theme.textcolor,
-        OutlineColor = theme.textborder,
-        Center = true,
-        Position = utility:Position(0.5, 0, 0, 1, button_frame),
-        Visible = page.open
-    }, section.visibleContent)
+    local button_title = Instance.new("TextLabel")
+    button_title.Name = "ButtonTitle"
+    button_title.Size = UDim2.new(0.5, 0, 1, 0)
+    button_title.Position = UDim2.new(0.5, 0, 0, 0)
+    button_title.Text = name
+    button_title.TextSize = theme.textsize
+    button_title.Font = theme.font
+    button_title.TextColor3 = theme.textcolor
+    button_title.OutlineColor = theme.textborder
+    button_title.TextXAlignment = Enum.TextXAlignment.Center
+    button_title.Parent = button_frame
 
     local function applyHoverEffect()
-        TweenService:Create(
-            button_frame,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(103, 123, 196)}
-        ):Play()
+        button_frame.BackgroundColor3 = Color3.fromRGB(103, 123, 196)
     end
 
     local function revertHoverEffect()
-        TweenService:Create(
-            button_frame,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(114, 137, 228)}
-        ):Play()
+        button_frame.BackgroundColor3 = theme.light_contrast
     end
 
     button_frame.MouseEnter:Connect(applyHoverEffect)
@@ -2619,22 +2612,18 @@ function sections:Button(info)
     button_frame.MouseButton1Click:Connect(function()
         pcall(callback)
         button_frame.TextSize = 0
-        TweenService:Create(
-            button_frame,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {TextSize = 14}
-        ):Play()
+        local textTween = button_frame:TweenSizeAndPosition(UDim2.new(1, -8, 0, 20), UDim2.new(0, 4, 0, button.axis), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+        textTween.Completed:Connect(function()
+            button_frame.TextSize = 14
+        end)
     end)
-
-    if pointer and tostring(pointer) ~= "" and tostring(pointer) ~= " " and not library.pointers[tostring(pointer)] then
-        library.pointers[tostring(pointer)] = button
-    end
 
     section.currentAxis = section.currentAxis + 20 + 4
     section:Update()
 
     return button
 end
+
 
     --
     function sections:ButtonHolder(info)
@@ -2651,45 +2640,32 @@ end
         local button = buttons[i]
         local axis = section.currentAxis
 
-        local button_frame = utility:Create("Frame", { Vector2.new(button.size, axis), section.section_frame }, {
-            Size = utility:Size(0.5, -6, 0, 20, section.section_frame),
-            Position = utility:Position(0, button.position, 0, axis, section.section_frame),
-            Color = theme.outline,
-            Visible = page.open
-        }, section.visibleContent)
+        local button_frame = Instance.new("TextButton")
+        button_frame.Name = "ButtonFrame"
+        button_frame.Size = UDim2.new(button.size, 0, 0, 20)
+        button_frame.Position = UDim2.new(0, button.position, 0, axis)
+        button_frame.BackgroundColor3 = theme.outline
+        button_frame.Visible = page.open
+        button_frame.Parent = section.visibleContent
 
-        local button_inline = utility:Create("Frame", { Vector2.new(1, 1), button_frame }, {
-            Size = utility:Size(1, -2, 1, -2, button_frame),
-            Position = utility:Position(0, 1, 0, 1, button_frame),
-            Color = theme.inline,
-            Visible = page.open
-        }, section.visibleContent)
-
-        local button_frame_content = utility:Create("Frame", { Vector2.new(1, 1), button_inline }, {
-            Size = utility:Size(1, -2, 1, -2, button_inline),
-            Position = utility:Position(0, 1, 0, 1, button_inline),
-            Color = theme.light_contrast,
-            Visible = page.open
-        }, section.visibleContent)
-
-        local button_title = utility:Create("TextLabel", { Vector2.new(button_frame_content.Size.X / 2, 1), button_frame_content }, {
-            Text = button.text,
-            Size = theme.textsize,
-            Font = theme.font,
-            Color = theme.textcolor,
-            OutlineColor = theme.textborder,
-            Center = true,
-            Position = utility:Position(0.5, 0, 0, 1, button_frame_content),
-            Visible = page.open
-        }, section.visibleContent)
+        local button_title = Instance.new("TextLabel")
+        button_title.Name = "ButtonTitle"
+        button_title.Size = UDim2.new(0.5, 0, 1, 0)
+        button_title.Position = UDim2.new(0.5, 0, 0, 0)
+        button_title.Text = button.text
+        button_title.TextSize = theme.textsize
+        button_title.Font = theme.font
+        button_title.TextColor3 = theme.textcolor
+        button_title.OutlineColor = theme.textborder
+        button_title.TextXAlignment = Enum.TextXAlignment.Center
+        button_title.Parent = button_frame
 
         local function applyHoverEffect()
-            local h, s, v = Color3.fromRGB(103, 123, 196):ToHSV()
-            button_frame.Color = Color3.fromHSV(h, 0.44, v)
+            button_frame.BackgroundColor3 = Color3.fromRGB(103, 123, 196)
         end
 
         local function revertHoverEffect()
-            button_frame.Color = theme.outline
+            button_frame.BackgroundColor3 = theme.outline
         end
 
         button_frame.MouseEnter:Connect(applyHoverEffect)
@@ -2699,15 +2675,10 @@ end
             button.callback()
         end)
 
-        if button.pointer and tostring(button.pointer) ~= "" and tostring(button.pointer) ~= " " and not library.pointers[tostring(button.pointer)] then
-            library.pointers[tostring(button.pointer)] = button
-        end
-
         section.currentAxis = axis + 20 + 4
         section:Update()
     end
 end
-
 
     --
     function sections:Textbox(info)
