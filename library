@@ -412,16 +412,16 @@ do
             Position = utility:Position(0, 1, 0, 1, frame_inline),
             Color = theme.light_contrast
         })
-        [[--
+
         local title = utility:Create("TextLabel", {Vector2.new(4,2), inner_frame}, {
             Text = window.title,
             Size = theme.textsize,
             Font = theme.font,
             Color = theme.textcolor,
             OutlineColor = theme.textborder,
-            Position = utility:Position(0, -60, 1, 0, inner_frame)
+            Position = utility:Position(0, -260, 100, 0, inner_frame)
         })
-        --]]
+
         local inner_frame_inline = utility:Create("Frame", {Vector2.new(4,18), inner_frame}, {
             Size = utility:Size(1, -8, 1, -22, inner_frame),
             Position = utility:Position(0, 4, 0, 18, inner_frame),
