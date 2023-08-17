@@ -383,14 +383,14 @@ do
 	pages.__index = pages
 	sections.__index = sections
     --
-	function library:New(info)
-	    local info = info or {}
-	    local name = info.name or info.Name or "UI Name"
-	    local title = info.title or info.Title or "UI Title"
-	    local size = info.size or info.Size or Vector2.new(504, 604)
-	    local accent = info.accent or info.Accent or info.color or info.Color or theme.accent
-	
-	    theme.accent = accent
+    function library:New(info)
+		local info = info or {}
+        local name = info.name or info.Name or "UI Name"
+        local title = info.title or info.Title or "UI Title"
+        local size = info.size or info.Size or Vector2.new(504,604)
+        local accent = info.accent or info.Accent or info.color or info.Color or theme.accent
+        --
+        theme.accent = accent
         --
         local window = {pages = {}, name = name, title = title, isVisible = false, uibind = Enum.KeyCode.Z, currentPage = nil, fading = false, dragging = false, drag = Vector2.new(0,0), currentContent = {frame = nil, dropdown = nil, multibox = nil, colorpicker = nil, keybind = nil, textbox = nil}}
         --
@@ -413,15 +413,14 @@ do
             Color = theme.light_contrast
         })
         --
-	    local titleText = "exceed.gg | 2.0.0 | discord.gg/Ctaxs9jzPm"
-	    local titleTextLabel = utility:Create("TextLabel", { Vector2.new(4, 2), inner_frame }, {
-	        Text = titleText,
-	        Size = theme.textsize,
-	        Font = theme.font,
-	        Color = theme.textcolor,
-	        OutlineColor = theme.textborder,
-	        Position = utility:Position(0, 4, 0, 2, inner_frame)
-	    })
+        local title = utility:Create("TextLabel", {Vector2.new(4,2), inner_frame}, {
+            Text = window.title,
+            Size = theme.textsize,
+            Font = theme.font,
+            Color = theme.textcolor,
+            OutlineColor = theme.textborder,
+            Position = utility:Position(0, 4, 0, 2, inner_frame)
+        })
         --
         local inner_frame_inline = utility:Create("Frame", {Vector2.new(4,18), inner_frame}, {
             Size = utility:Size(1, -8, 1, -22, inner_frame),
