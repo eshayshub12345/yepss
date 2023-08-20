@@ -2999,7 +2999,7 @@ function sections:Dropdown(info)
                     dropdown.holder.inline = dropdown_open_inline
 
                     for i, v in pairs(options) do
-                        local optionIndex = i + dropdownScrollOffset
+                        local optionIndex = i + firstVisibleOption - 1
                         local optionText = options[optionIndex]
 
                         if optionText and i <= maxVisibleOptions then
