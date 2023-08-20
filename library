@@ -2995,7 +2995,7 @@ function sections:Dropdown(info)
         Color = theme.textcolor,
         OutlineColor = theme.textborder,
         Position = utility:Position(1, -18, 0, 1 + dropdown.axis, section.section_frame),
-        TextXAlignment = "Right",
+        TextAlignment = "Right",
         Visible = page.open
     }, section.visibleContent)
 
