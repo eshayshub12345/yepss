@@ -2860,20 +2860,6 @@ function sections:Dropdown(info)
         Visible = page.open
     }, section.visibleContent)
 
-    local dropdown_inline = utility:Create("Frame", {Vector2.new(1, 1), dropdown_outline}, {
-        Size = utility:Size(1, -2, 1, -2, dropdown_outline),
-        Position = utility:Position(0, 1, 0, 1, dropdown_outline),
-        Color = theme.inline,
-        Visible = page.open
-    }, section.visibleContent)
-
-    local dropdown_frame = utility:Create("Frame", {Vector2.new(1, 1), dropdown_inline}, {
-        Size = utility:Size(1, -2, 0, dropdownFrameHeight, dropdown_inline),
-        Position = utility:Position(0, 1, 0, 1, dropdown_inline),
-        Color = theme.light_contrast,
-        Visible = page.open,
-    }, section.visibleContent)
-
     local dropdown_title = utility:Create("TextLabel", {Vector2.new(4, dropdown.axis), section.section_frame}, {
         Text = name,
         Size = theme.textsize,
@@ -2887,12 +2873,11 @@ function sections:Dropdown(info)
     function dropdown:CreateScrollingFrame()
         local scrollingFrameHeight = math.min(#options, maxVisibleOptions) * dropdownOptionHeight
 
-        local scrollingFrame = utility:Create("ScrollingFrame", {Vector2.new(1, 1), dropdown_frame}, {
-            Size = utility:Size(1, 0, 0, scrollingFrameHeight, dropdown_frame), -- Adjust the height
-            Position = utility:Position(0, 0, 0, 0, dropdown_frame),
+        local scrollingFrame = utility:Create("ScrollingFrame", {Vector2.new(1, 1), dropdown_outline}, {
+            Size = utility:Size(1, -2, 0, scrollingFrameHeight, dropdown_outline), -- Adjust the height
+            Position = utility:Position(0, 1, 0, 21, dropdown_outline), -- Offset to make room for the title
             ScrollBarImageColor3 = theme.accent,
-            CanvasSize = UDim2.new(0, 0, 0, #options * dropdownOptionHeight), -- Set the canvas size
-        }, dropdown_frame)
+        }, dropdown_outline)
 
         for i, v in pairs(options) do
             if i <= maxVisibleOptions then -- Only add visible options
@@ -2955,15 +2940,131 @@ function sections:Dropdown(info)
 
     function dropdown:Refresh(newOptions)
         options = newOptions
-        dropdown_frame.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, #options * dropdownOptionHeight) -- Update the CanvasSize when options change
+        updateCanvasSize() -- Update the CanvasSize when options change
+        dropdown:CreateScrollingFrame()
+        dropdown:Update()
+        dropdown:Set(dropdown.current)
     end
 
-    function dropdown:Get()
-        return dropdown.current
+    local dropdown_frame = utility:Create("Frame", {Vector2.new(1, 1), dropdown_outline}, {
+        Size = utility:Size(1, -2, 0, dropdownFrameHeight, dropdown_outline), -- Adjust the height
+        Position = utility:Position(0, 1, 0, 21, dropdown_outline), -- Offset to make room for the title
+        Color = theme.main,
+        Visible = page.open,
+    }, dropdown_outline)
+
+    local dropdown_value = utility:Create("TextLabel", {Vector2.new(8, 2), dropdown_frame}, {
+        Text = dropdown.current,
+        Size = theme.textsize,
+        Font = theme.font,
+        Color = theme.textcolor,
+        OutlineColor = theme.textborder,
+        Position = utility:Position(0, 8, 0, 2, dropdown_frame),
+        Visible = page.open
+    }, dropdown_frame)
+
+    function dropdown_frame:Draw()
+        for i, v in pairs(dropdown.holder.drawings) do
+            utility:Remove(v)
+        end
+
+        dropdown.holder.drawings = {}
+
+        if dropdown.open then
+            local canvas = dropdown_frame.CanvasPosition
+            local visibleButtons = {}
+            for i, button in pairs(dropdown.holder.buttons) do
+                if utility:MouseOverDrawingInstance(button[2]) then
+                    visibleButtons[i] = button
+                end
+            end
+            local maxVisibleOptions = math.min(#options, maxVisibleOptions)
+            for i, v in pairs(visibleButtons) do
+                v[2].Position = utility:Position(0, 1, 0, 1 + (19 * (i - 1)), dropdown_frame)
+                v[1].Position = utility:Position(0, v[1].Text == tostring(dropdown.current) and 8 or 6, 0, 2, v[2])
+
+                local dropdown_mouseover = utility:Create("Quad", {Vector2.new(0, 0)}, {
+                    Size = utility:Size(1, -2, 0, 18, v[2]),
+                    Position = utility:Position(0, 1, 0, 1, v[2]),
+                    Color = Color3.fromRGB(30, 30, 30),
+                    Transparency = 0.1,
+                    ZIndex = 49,
+                }, v[2])
+
+                dropdown.holder.drawings[#dropdown.holder.drawings + 1] = dropdown_mouseover
+            end
+        end
     end
 
-    library.began[#library.began + 1] = function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1 and window.isVisible and dropdown_outline.Visible then
+    local function updateCanvasSize()
+        local canvasSize = UDim2.new(0, 0, 0, math.min(#options, maxVisibleOptions) * dropdownOptionHeight)
+        dropdown_frame.CanvasSize = canvasSize
+    end
+
+    updateCanvasSize() -- Initialize the CanvasSize
+
+    local dropdown_scrollbar = utility:Create("Image", {Vector2.new(0, 0), dropdown_frame}, {
+        Size = utility:Size(0, 8, 1, 0, dropdown_frame),
+        Position = utility:Position(0, 0, 0, 0, dropdown_frame),
+        Color = theme.main,
+        Image = "rbxassetid://4458906404",
+        ImageRectSize = Vector2.new(16, 16),
+        Visible = page.open
+    }, dropdown_frame)
+
+    dropdown_scrollbar.ScrollImage = "rbxassetid://4458906585"
+    dropdown_scrollbar.ScrollImageTransparency = 0
+
+    dropdown_frame.ScrollBarThickness = 8
+    dropdown_frame.BorderSizePixel = 0
+    dropdown_frame.BorderColor3 = theme.outline
+    dropdown_frame.BackgroundColor3 = theme.outline
+
+    dropdown_frame.ScrollingEnabled = false
+    dropdown_frame.ScrollingDirection = Enum.ScrollingDirection.Y
+    dropdown_frame.ElasticBehavior = Enum.ElasticBehavior.Never
+
+    dropdown_frame.CanvasPosition = Vector2.new(0, 0)
+
+    dropdown_frame.MouseEnter:Connect(function()
+        if not dropdown.open then
+            dropdown_frame.ScrollingEnabled = true
+            dropdown_scrollbar.ScrollImageTransparency = 0.5
+        end
+    end)
+
+    dropdown_frame.MouseLeave:Connect(function()
+        dropdown_frame.ScrollingEnabled = false
+        dropdown_scrollbar.ScrollImageTransparency = 0
+    end)
+
+    local function closeDropdown()
+        dropdown_frame.ScrollingEnabled = false
+        dropdown_scrollbar.ScrollImageTransparency = 0
+    end
+
+    local function enableDropdown()
+        if not dropdown.open then
+            dropdown_frame.ScrollingEnabled = true
+            dropdown_scrollbar.ScrollImageTransparency = 0.5
+        end
+    end
+
+    utility:Create("UIAspectRatioConstraint", {Vector2.new(1, 1), dropdown_scrollbar}, {
+        AspectType = Enum.AspectType.FitWithinMaxSize,
+        DominantAxis = Enum.DominantAxis.Height,
+        AspectRatio = 1,
+    })
+
+    -- The code below will ensure that nothing is loaded until the dropdown is opened.
+    dropdown.holder.inline = nil
+
+    dropdown_frame.Visible = false
+
+    dropdown_frame:Draw()
+
+    utility:Connection(uis.InputBegan, function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and window.isVisible and dropdown_outline.Visible then
             if dropdown.open and dropdown.holder.inline and utility:MouseOverDrawing({dropdown.holder.inline.Position.X, dropdown.holder.inline.Position.Y, dropdown.holder.inline.Position.X + dropdown.holder.inline.Size.X, dropdown.holder.inline.Position.Y + dropdown.holder.inline.Size.Y}) then
                 for i, v in pairs(dropdown.holder.buttons) do
                     if utility:MouseOverDrawing({v[2].Position.X, v[2].Position.Y, v[2].Position.X + v[2].Size.X, v[2].Position.Y + v[2].Size.Y}) and v[1].Text ~= dropdown.current then
@@ -2978,46 +3079,11 @@ function sections:Dropdown(info)
                     window:CloseContent()
                     dropdown.open = not dropdown.open
                     utility:LoadImage(dropdown_image, "arrow_up", "https://i.imgur.com/SL9cbQp.png")
-
-                    local dropdown_open_outline = utility:Create("Frame", {Vector2.new(0, 19), dropdown_outline}, {
-                        Size = utility:Size(1, 0, 0, 3 + (#options * 19), dropdown_outline),
-                        Position = utility:Position(0, 0, 0, 19, dropdown_outline),
-                        Color = theme.outline,
-                        Visible = page.open
-                    }, dropdown.holder.drawings)
-                    dropdown.holder.outline = dropdown_open_outline
-
-                    local dropdown_open_inline = utility:Create("Frame", {Vector2.new(1, 1), dropdown_open_outline}, {
-                        Size = utility:Size(1, -2, 1, -2, dropdown_open_outline),
-                        Position = utility:Position(0, 1, 0, 1, dropdown_open_outline),
-                        Color = theme.inline,
-                        Visible = page.open
-                    }, dropdown.holder.drawings)
-                    dropdown.holder.inline = dropdown_open_inline
-
-                    for i, v in pairs(options) do
-                        local dropdown_value_frame = utility:Create("Frame", {Vector2.new(1, 1 + (19 * (i - 1))), dropdown_open_inline}, {
-                            Size = utility:Size(1, -2, 0, 18, dropdown_open_inline),
-                            Position = utility:Position(0, 1, 0, 1 + (19 * (i - 1)), dropdown_open_inline),
-                            Color = theme.light_contrast,
-                            Visible = page.open
-                        }, dropdown.holder.drawings)
-                        local dropdown_value = utility:Create("TextLabel", {Vector2.new(v == tostring(dropdown.current) and 8 or 6, 2), dropdown_value_frame}, {
-                            Text = v,
-                            Size = theme.textsize,
-                            Font = theme.font,
-                            Color = v == tostring(dropdown.current) and theme.accent or theme.textcolor,
-                            OutlineColor = theme.textborder,
-                            Position = utility:Position(0, v == tostring(dropdown.current) and 8 or 6, 0, 2, dropdown_value_frame),
-                            Visible = page.open
-                        }, dropdown.holder.drawings)
-                        dropdown.holder.buttons[#dropdown.holder.buttons + 1] = {dropdown_value, dropdown_value_frame}
-                    end
-
-                    window.currentContent.frame = dropdown_open_inline
-                    window.currentContent.dropdown = dropdown
-
-                    dropdown:Update()
+                    dropdown.holder.inline = dropdown:CreateScrollingFrame()
+                    dropdown.holder.inline.ZIndex = 50
+                    dropdown.holder.inline.Visible = true
+                    dropdown_frame.Visible = true
+                    enableDropdown()
                 else
                     dropdown.open = not dropdown.open
                     utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
@@ -3028,66 +3094,29 @@ function sections:Dropdown(info)
 
                     dropdown.holder.drawings = {}
                     dropdown.holder.buttons = {}
+                    dropdown.holder.inline:Remove()
                     dropdown.holder.inline = nil
-
-                    window.currentContent.frame = nil
-                    window.currentContent.dropdown = nil
+                    closeDropdown()
                 end
-            else
-                if dropdown.open then
-                    dropdown.open = not dropdown.open
-                    utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+            elseif dropdown.open then
+                dropdown.open = not dropdown.open
+                utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
 
-                    for i, v in pairs(dropdown.holder.drawings) do
-                        utility:Remove(v)
-                    end
-
-                    dropdown.holder.drawings = {}
-                    dropdown.holder.buttons = {}
-                    dropdown.holder.inline = nil
-
-                    window.currentContent.frame = nil
-                    window.currentContent.dropdown = nil
+                for i, v in pairs(dropdown.holder.drawings) do
+                    utility:Remove(v)
                 end
-            end
-        elseif Input.UserInputType == Enum.UserInputType.MouseButton1 and dropdown.open then
-            dropdown.open = not dropdown.open
-            utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
 
-            for i, v in pairs(dropdown.holder.drawings) do
-                utility:Remove(v)
-            end
-
-            dropdown.holder.drawings = {}
-            dropdown.holder.buttons = {}
-            dropdown.holder.inline = nil
-
-            window.currentContent.frame = nil
-            window.currentContent.dropdown = nil
-        end
-    end
-
-    library.changed[#library.changed + 1] = function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseMovement and dropdown_outline.Visible and window.isVisible then
-            if utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + dropdown.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + dropdown.axis + 15 +  20}) and not window:IsOverContent() then
-                local h, s, v = theme.accent:ToHSV()
-                dropdown_inline.Color = Color3.fromHSV(h, 0.44, v)
-            else
-                dropdown_inline.Color = theme.inline
+                dropdown.holder.drawings = {}
+                dropdown.holder.buttons = {}
+                dropdown.holder.inline:Remove()
+                dropdown.holder.inline = nil
+                closeDropdown()
             end
         end
-    end
-
-    if pointer and tostring(pointer) ~= "" and tostring(pointer) ~= " " and not library.pointers[tostring(pointer)] then
-        library.pointers[tostring(pointer)] = dropdown
-    end
-
-    section.currentAxis = section.currentAxis + dropdownFrameHeight + 4
-    section:Update()
-
+    end)
+    
     return dropdown
 end
-
 
     --
     function sections:Multibox(info)
