@@ -2855,7 +2855,8 @@ function sections:Dropdown(info)
     local dropdown = { open = false, current = tostring(def), holder = { buttons = {}, drawings = {} }, axis = section.currentAxis }
 
     local scrollbarWidth = 10 -- Adjust as needed
-    local dropdown_width = section.section_frame.Size.X - UDim2.new(0, scrollbarWidth, 0, 0)
+    local dropdown_width = section.section_frame.Size.X - scrollbarWidth
+
 
 
     local dropdown_outline = utility:Create("Frame", { Vector2.new(4, dropdown.axis + 15), section.section_frame }, {
