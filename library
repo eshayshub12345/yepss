@@ -2844,20 +2844,15 @@ function sections:Dropdown(info)
     local callback = info.callback or info.callBack or info.Callback or info.CallBack or function() end
 
     local firstVisibleOption = 1
-    local maxVisibleOptions = 7
+    local maxVisibleOptions = math.min(#options, 7)  -- Maximum of 7 visible options
     local dropdownScrollOffset = 0
-    local dropdownValueIndex = 1
+    local dropdownValueIndex = 1  -- Index of the selected option
 
     local window = self.window
-    local page = self
+    local page = self.page
     local section = self
 
     local dropdown = { open = false, current = tostring(def), holder = { buttons = {}, drawings = {} }, axis = section.currentAxis }
-
-    local scrollbarWidth = 10 -- Adjust as needed
-    local dropdown_width = section.section_frame.Size.X - scrollbarWidth
-
-
 
     local dropdown_outline = utility:Create("Frame", { Vector2.new(4, dropdown.axis + 15), section.section_frame }, {
         Size = utility:Size(1, -8, 0, 20, section.section_frame),
@@ -2907,36 +2902,20 @@ function sections:Dropdown(info)
         Visible = page.open
     }, section.visibleContent)
 
-    local dropdown_image = utility:Create("Image", {
-    Position = UDim2.new(0, dropdown_frame.Size.X.Offset - 15, 0, dropdown_frame.Size.Y.Offset / 2 - 3),
-    Parent = dropdown_frame,
-    Size = utility:Size(0, 9, 0, 6, dropdown_frame),
-    Visible = page.open
-}, section.visibleContent)
+    local dropdown_image = utility:Create("Image", { Vector2.new(dropdown_frame.Size.X - 15, dropdown_frame.Size.Y / 2 - 3), dropdown_frame }, {
+        Size = utility:Size(0, 9, 0, 6, dropdown_frame),
+        Position = utility:Position(1, -15, 0.5, -3, dropdown_frame),
+        Visible = page.open
+    }, section.visibleContent)
 
     dropdown["dropdown_image"] = dropdown_image
 
     utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
 
-    local scrollbarOutline = utility:Create("Frame", { Vector2.new(1, 0), dropdown_inline }, {
-        Size = utility:Size(0, scrollbarWidth, 1, 0, dropdown_inline),
-        Position = utility:Position(1, -scrollbarWidth, 0, 0, dropdown_inline),
-        Color = theme.outline,
-        Visible = page.open
-    }, section.visibleContent)
-
-    local scrollbarHandle = utility:Create("Frame", { Vector2.new(0, 0), scrollbarOutline }, {
-        Size = utility:Size(1, 0, 1, 0, scrollbarOutline),
-        Position = utility:Position(0, 0, 0, 0, scrollbarOutline),
-        Color = theme.light_contrast,
-        Visible = page.open
-    }, section.visibleContent)
-
     function dropdown:ScrollUp()
         if firstVisibleOption > 1 then
             firstVisibleOption = firstVisibleOption - 1
             dropdown:Update()
-            updateScrollbarPosition()
         end
     end
 
@@ -2944,7 +2923,6 @@ function sections:Dropdown(info)
         if firstVisibleOption + maxVisibleOptions - 1 < #options then
             firstVisibleOption = firstVisibleOption + 1
             dropdown:Update()
-            updateScrollbarPosition()
         end
     end
 
@@ -2964,20 +2942,6 @@ function sections:Dropdown(info)
                     v[2].Visible = false
                 end
             end
-        end
-    end
-
-    -- Function to update scrollbar position
-    local function updateScrollbarPosition()
-        local numOptions = #options
-        if numOptions > maxVisibleOptions then
-            local visibleRatio = maxVisibleOptions / numOptions
-            local scrollableHeight = dropdown_inline.Size.Y.Offset - scrollbarHandle.Size.Y.Offset
-            local scrollPosition = (firstVisibleOption - 1) / (numOptions - maxVisibleOptions)
-            scrollbarHandle.Position = UDim2.new(0, 0, scrollPosition, 0)
-            scrollbarHandle.Size = UDim2.new(1, 0, visibleRatio, 0)
-        else
-            scrollbarHandle.Size = UDim2.new(1, 0, 1, 0)
         end
     end
 
