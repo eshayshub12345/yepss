@@ -2988,16 +2988,17 @@ function sections:Dropdown(info)
         end
     end
 
-    utility:Create("TextLabel", { Vector2.new(4, dropdown.axis), section.section_frame }, {
-        Text = tostring(def),
-        Size = theme.textsize,
-        Font = theme.font,
-        Color = theme.textcolor,
-        OutlineColor = theme.textborder,
-        Position = utility:Position(1, -18, 0, 1 + dropdown.axis, section.section_frame),
-        TextAlignment = "Right",
-        Visible = page.open
-    }, section.visibleContent)
+	utility:Create("TextLabel", { Vector2.new(4, dropdown.axis), section.section_frame }, {
+	    Text = tostring(def),
+	    Size = theme.textsize,
+	    Font = theme.font,
+	    Color = theme.textcolor,
+	    OutlineColor = theme.textborder,
+	    Position = utility:Position(1, -18, 0, 1 + dropdown.axis, section.section_frame),
+	    TextStrokeTransparency = 0,
+	    TextXAlignment = Enum.TextXAlignment.Right, -- Use Enum.TextXAlignment to set alignment
+	    Visible = page.open
+	}, section.visibleContent)
 
 	local dropdownValue = utility:Create("TextLabel", { Vector2.new(4, dropdown.axis), section.section_frame }, {
 	    Text = "▼",
