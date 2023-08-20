@@ -2908,6 +2908,7 @@ function sections:Dropdown(info)
     utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
 
     function dropdown:Update()
+        local dropdown_connect
         if dropdown.open and dropdown.holder.inline then
             for i, v in pairs(dropdown.holder.buttons) do
                 v[1].Color = v[1].Text == tostring(dropdown.current) and theme.accent or theme.textcolor
