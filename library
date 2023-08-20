@@ -2835,118 +2835,198 @@ end
         return textbox
     end
     --
-    function sections:Dropdown(info)
-        local info = info or {}
-        local name = info.name or info.Name or info.title or info.Title or "New Dropdown"
-        local options = info.options or info.Options or {"1", "2", "3"}
-        local def = info.def or info.Def or info.default or info.Default or options[1]
-        local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
-        local callback = info.callback or info.callBack or info.Callback or info.CallBack or function() end
-        --
-        local window = self.window
-        local page = self.page
-        local section = self
-        --
-        local dropdown = {open = false, current = tostring(def), holder = {buttons = {}, drawings = {}}, axis = section.currentAxis}
-        --
-        local dropdown_outline = utility:Create("Frame", {Vector2.new(4,dropdown.axis + 15), section.section_frame}, {
-            Size = utility:Size(1, -8, 0, 20, section.section_frame),
-            Position = utility:Position(0, 4, 0, dropdown.axis + 15, section.section_frame),
-            Color = theme.outline,
-            Visible = page.open
-        }, section.visibleContent)
-        --
-        local dropdown_inline = utility:Create("Frame", {Vector2.new(1,1), dropdown_outline}, {
-            Size = utility:Size(1, -2, 1, -2, dropdown_outline),
-            Position = utility:Position(0, 1, 0, 1, dropdown_outline),
-            Color = theme.inline,
-            Visible = page.open
-        }, section.visibleContent)
-        --
-        local dropdown_frame = utility:Create("Frame", {Vector2.new(1,1), dropdown_inline}, {
-            Size = utility:Size(1, -2, 1, -2, dropdown_inline),
-            Position = utility:Position(0, 1, 0, 1, dropdown_inline),
-            Color = theme.light_contrast,
-            Visible = page.open
-        }, section.visibleContent)
-        --
-        local dropdown_title = utility:Create("TextLabel", {Vector2.new(4,dropdown.axis), section.section_frame}, {
-            Text = name,
-            Size = theme.textsize,
-            Font = theme.font,
-            Color = theme.textcolor,
-            OutlineColor = theme.textborder,
-            Position = utility:Position(0, 4, 0, dropdown.axis, section.section_frame),
-            Visible = page.open
-        }, section.visibleContent)
-        --
-        local dropdown__gradient = utility:Create("Image", {Vector2.new(0,0), dropdown_frame}, {
-            Size = utility:Size(1, 0, 1, 0, dropdown_frame),
-            Position = utility:Position(0, 0, 0 , 0, dropdown_frame),
-            Transparency = 0.5,
-            Visible = page.open
-        }, section.visibleContent)
-        --
-        local dropdown_value = utility:Create("TextLabel", {Vector2.new(3,dropdown_frame.Size.Y/2 - 7), dropdown_frame}, {
-            Text = dropdown.current,
-            Size = theme.textsize,
-            Font = theme.font,
-            Color = theme.textcolor,
-            OutlineColor = theme.textborder,
-            Position = utility:Position(0, 3, 0, (dropdown_frame.Size.Y/2) - 7, dropdown_frame),
-            Visible = page.open
-        }, section.visibleContent)
-        --
-        local dropdown_image = utility:Create("Image", {Vector2.new(dropdown_frame.Size.X - 15,dropdown_frame.Size.Y/2 - 3), dropdown_frame}, {
-            Size = utility:Size(0, 9, 0, 6, dropdown_frame),
-            Position = utility:Position(1, -15, 0.5, -3, dropdown_frame),
-            Visible = page.open
-        }, section.visibleContent);dropdown["dropdown_image"] = dropdown_image
-        --
-        utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
-       -- utility:LoadImage(dropdown__gradient, "gradient", "https://i.imgur.com/5hmlrjX.png")
-        --
-        function dropdown:Update()
-	    if dropdown.open and dropdown.holder.inline then
-	        --
-	        for i,v in pairs(dropdown.holder.buttons) do
-	            v[1].Position = utility:Position(0, v[1].Text == tostring(dropdown.current) and 8 or 6, 0, 2, v[2])
-	            utility:UpdateOffset(v[1], {Vector2.new(v[1].Text == tostring(dropdown.current) and 8 or 6, 2), v[2]})
-	        end
-	        --
-	        local max_options = 7
-	        local scroll_y = 0
-	        if #dropdown.holder.buttons > max_options then
-	            scroll_y = math.floor(#dropdown.holder.buttons / max_options)
-	        end
-	        for i = 1, max_options do
-	            if i + scroll_y <= #dropdown.holder.buttons then
-	                dropdown.holder.buttons[i][2].Position = utility:Position(0, 1 + (19 * (i - 1)), 0, 1 + (19 * (i - 1)), dropdown.holder.inline)
-	            else
-	                if not dropdown.holder.buttons[i][2].Visible then
-	                    local scroll_up = utility:Create("ImageButton", {Vector2.new(1,0), dropdown_open_inline}, {
-	                        Size = utility:Size(0, 16, 0, 16, dropdown_open_inline),
-	                        Position = utility:Position(0, -16, 0.5, -4, dropdown_open_inline),
-	                        Image = "rbxassetid://8829644633",
-	                        Visible = page.open
-	                    }, dropdown.holder.drawings)
-	                    utility:AddInputListener(scroll_up, function(Input)
-	                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-	                            if scroll_y > 0 then
-	                                scroll_y = scroll_y - 1
-	                                for i = 1, max_options do
-	                                    dropdown.holder.buttons[i][2].Position = utility:Position(0, 1 + (19 * (i - 1)), 0, 1 + (19 * (i - 1)), dropdown.holder.inline)
-	                                end
-	                            end
-	                        end
-	                    end)
-	                    dropdown.holder.buttons[max_options][2] = scroll_up
-	                end
-	            end
-	        end
-	    end
+function sections:Dropdown(info)
+    local info = info or {}
+    local name = info.name or info.Name or info.title or info.Title or "New Dropdown"
+    local options = info.options or info.Options or {"1", "2", "3", "4", "5", "6", "7"}  -- Maximum 7 options
+    local def = info.def or info.Def or info.default or info.Default or options[1]
+    local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
+    local callback = info.callback or info.callBack or info.Callback or info.CallBack or function() end
+
+    local window = self.window
+    local page = self.page
+    local section = self
+
+    local dropdown = {open = false, current = tostring(def), holder = {buttons = {}, drawings = {}}, axis = section.currentAxis}
+
+    local dropdown_outline = utility:Create("Frame", {Vector2.new(4,dropdown.axis + 15), section.section_frame}, {
+        Size = utility:Size(1, -8, 0, 20, section.section_frame),
+        Position = utility:Position(0, 4, 0, dropdown.axis + 15, section.section_frame),
+        Color = theme.outline,
+        Visible = page.open
+    }, section.visibleContent)
+
+    local dropdown_inline = utility:Create("Frame", {Vector2.new(1,1), dropdown_outline}, {
+        Size = utility:Size(1, -2, 1, -2, dropdown_outline),
+        Position = utility:Position(0, 1, 0, 1, dropdown_outline),
+        Color = theme.inline,
+        Visible = page.open
+    }, section.visibleContent)
+
+    local dropdown_frame = utility:Create("Frame", {Vector2.new(1,1), dropdown_inline}, {
+        Size = utility:Size(1, -2, 1, -2, dropdown_inline),
+        Position = utility:Position(0, 1, 0, 1, dropdown_inline),
+        Color = theme.light_contrast,
+        Visible = page.open
+    }, section.visibleContent)
+
+    local dropdown_title = utility:Create("TextLabel", {Vector2.new(4,dropdown.axis), section.section_frame}, {
+        Text = name,
+        Size = theme.textsize,
+        Font = theme.font,
+        Color = theme.textcolor,
+        OutlineColor = theme.textborder,
+        Position = utility:Position(0, 4, 0, dropdown.axis, section.section_frame),
+        Visible = page.open
+    }, section.visibleContent)
+
+    local dropdown__gradient = utility:Create("Image", {Vector2.new(0,0), dropdown_frame}, {
+        Size = utility:Size(1, 0, 1, 0, dropdown_frame),
+        Position = utility:Position(0, 0, 0 , 0, dropdown_frame),
+        Transparency = 0.5,
+        Visible = page.open
+    }, section.visibleContent)
+
+    local dropdown_value = utility:Create("TextLabel", {Vector2.new(3,dropdown_frame.Size.Y/2 - 7), dropdown_frame}, {
+        Text = dropdown.current,
+        Size = theme.textsize,
+        Font = theme.font,
+        Color = theme.textcolor,
+        OutlineColor = theme.textborder,
+        Position = utility:Position(0, 3, 0, (dropdown_frame.Size.Y/2) - 7, dropdown_frame),
+        Visible = page.open
+    }, section.visibleContent)
+
+    local dropdown_image = utility:Create("Image", {Vector2.new(dropdown_frame.Size.X - 15,dropdown_frame.Size.Y/2 - 3), dropdown_frame}, {
+        Size = utility:Size(0, 9, 0, 6, dropdown_frame),
+        Position = utility:Position(1, -15, 0.5, -3, dropdown_frame),
+        Visible = page.open
+    }, section.visibleContent)
+    dropdown["dropdown_image"] = dropdown_image
+
+    utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+
+    function dropdown:Update()
+        if dropdown.open and dropdown.holder.inline then
+            for i,v in pairs(dropdown.holder.buttons) do
+                v[1].Color = v[1].Text == tostring(dropdown.current) and theme.accent or theme.textcolor
+                local dropdown_connect dropdown_connect = rs.RenderStepped:Connect(function()
+                    if dropdown.open and v[1].Text == tostring(dropdown.current) then
+                        v[1].Color = theme.accent
+                    else
+                        dropdown_connect:Disconnect()
+                    end
+                end)
+                v[1].Position = utility:Position(0, v[1].Text == tostring(dropdown.current) and 8 or 6, 0, 2, v[2])
+                utility:UpdateOffset(v[1], {Vector2.new(v[1].Text == tostring(dropdown.current) and 8 or 6, 2), v[2]})
+            end
+        end
+    end
+
+    function dropdown:Set(value)
+        if typeof(value) == "string" and table.find(options, value) then
+            dropdown.current = value
+            dropdown_value.Text = value
+            callback(value)
+        end
+    end
+
+    function dropdown:Refresh(newOptions)
+        options = newOptions
+        dropdown:UpdateVisibleOptions() -- Update visible options when the list changes
+    end
+
+    function dropdown:Get()
+        return dropdown.current
+    end
+
+    -- Create a scrollbar frame
+    local scrollbar = utility:Create("Frame", {Vector2.new(0, 0), dropdown_inline}, {
+        Size = utility:Size(0, 5, 1, 0, dropdown_inline),
+        Position = utility:Position(1, -5, 0, 0, dropdown_inline),
+        Color = theme.scrollbar_color,
+        Visible = #options > maxVisibleOptions -- Show scrollbar if there are more options than maxVisibleOptions
+    }, dropdown_inline)
+
+    local scrollbar_handle = utility:Create("Frame", {Vector2.new(0, 0), scrollbar}, {
+        Size = utility:Size(1, 0, 0, 0, scrollbar),
+        Position = UDim2.new(0, 0, 0, 0),
+        Color = theme.scrollbar_handle_color,
+        Visible = #options > maxVisibleOptions -- Show scrollbar handle if there are more options than maxVisibleOptions
+    }, scrollbar)
+
+    local isDraggingScrollbar = false
+
+    -- Handle scrollbar interaction
+    scrollbar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local mousePos = input.Position.Y
+            local scrollbarTop = scrollbar.AbsolutePosition.Y
+            local scrollbarBottom = scrollbarTop + scrollbar.AbsoluteSize.Y
+            local scrollbarHandleTop = scrollbar_handle.AbsolutePosition.Y
+            local scrollbarHandleBottom = scrollbarHandleTop + scrollbar_handle.AbsoluteSize.Y
+
+            if mousePos >= scrollbarHandleTop and mousePos <= scrollbarHandleBottom then
+                isDraggingScrollbar = true
+                local mouseYOffset = mousePos - scrollbarHandleTop
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        isDraggingScrollbar = false
+                    end
+                end)
+                rs.RenderStepped:Connect(function()
+                    if isDraggingScrollbar then
+                        local newY = math.clamp(mousePos - mouseYOffset, scrollbarTop, scrollbarBottom - scrollbar_handle.AbsoluteSize.Y)
+                        scrollbar_handle.Position = UDim2.new(0, 0, 0, newY - scrollbarTop)
+                        local scrollPercent = (newY - scrollbarTop) / (scrollbarBottom - scrollbarTop - scrollbar_handle.AbsoluteSize.Y)
+                        local numVisibleOptions = #options - maxVisibleOptions + 1
+                        local firstVisibleOption = math.floor(scrollPercent * numVisibleOptions + 0.5) + 1
+                        dropdown:UpdateVisibleOptions(firstVisibleOption)
+                    end
+                end)
+            end
+        end
+    end)
+
+    -- ... (rest of your code)
+
+    -- Call this function to initialize visible options
+    function dropdown:UpdateVisibleOptions(firstVisibleOption)
+        firstVisibleOption = firstVisibleOption or 1
+        for i, v in ipairs(dropdown.holder.buttons) do
+            if options[i + firstVisibleOption - 1] then
+                v[1].Text = options[i + firstVisibleOption - 1]
+                v[2].Visible = true
+            else
+                v[1].Text = ""
+                v[2].Visible = false
+            end
+        end
+    end
+
+	-- Call this function to update the dropdown's appearance and visible options
+	function dropdown:Update()
+		dropdown:UpdateVisibleOptions()
+		if dropdown.open and dropdown.holder.inline then
+			for i, v in pairs(dropdown.holder.buttons) do
+				v[1].Color = v[1].Text == tostring(dropdown.current) and theme.accent or theme.textcolor
+				if v[1].Text == tostring(dropdown.current) then
+					local dropdown_connect
+					dropdown_connect = rs.RenderStepped:Connect(function()
+						if dropdown.open and v[1].Text == tostring(dropdown.current) then
+							v[1].Color = theme.accent
+						else
+							dropdown_connect:Disconnect()
+						end
+					end)
+				end
+				v[1].Position = utility:Position(0, v[1].Text == tostring(dropdown.current) and 8 or 6, 0, 2, v[2])
+				utility:UpdateOffset(v[1], {Vector2.new(v[1].Text == tostring(dropdown.current) and 8 or 6, 2), v[2]})
+			end
+		end
 	end
-	        --
+
+        --
         function dropdown:Set(value)
             if typeof(value) == "string" and table.find(options, value) then
                 dropdown.current = value
