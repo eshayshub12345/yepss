@@ -2999,16 +2999,16 @@ function sections:Dropdown(info)
         Visible = page.open
     }, section.visibleContent)
 
-    local dropdownValue = utility:Create("TextLabel", { Vector2.new(4, dropdown.axis), section.section_frame }, {
-        Text = "▼",
-        Size = theme.textsize,
-        Font = theme.font,
-        Color = theme.textcolor,
-        OutlineColor = theme.textborder,
-        Position = utility:Position(1, -15, 0, 1 + dropdown.axis, section.section_frame),
-        TextXAlignment = "Right",
-        Visible = page.open,
-    }, section.visibleContent)
+	local dropdownValue = utility:Create("TextLabel", { Vector2.new(4, dropdown.axis), section.section_frame }, {
+	    Text = "▼",
+	    Size = theme.textsize,
+	    Font = theme.font,
+	    Color = theme.textcolor,
+	    OutlineColor = theme.textborder,
+	    Position = utility:Position(1, -15, 0, 1 + dropdown.axis, section.section_frame),
+	    TextAlignment = "Right",
+	    Visible = page.open,
+	}, section.visibleContent)
     dropdown["dropdownValue"] = dropdownValue
 
     dropdownValue.Position = utility:Position(1, -18, 0, 1 + dropdown.axis, section.section_frame)
