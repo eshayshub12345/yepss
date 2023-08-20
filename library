@@ -2907,7 +2907,14 @@ sections:Dropdown(info)
         Visible = page.open
     }, section.visibleContent)
 
-    dropdown["dropdown_image"] = dropdown_image
+    local scrollbar = utility:Create("Frame", { Vector2.new(1, 0), dropdown_frame }, {
+        Size = utility:Size(0, 4, 1, 0, dropdown_frame), -- Adjust the size and position as needed
+        Position = utility:Position(1, -4, 0, 0, dropdown_frame),
+        Color = theme.scrollbar_color, -- Customize the scrollbar color
+        Visible = page.open
+    }, section.visibleContent)
+
+    dropdown["scrollbar"] = scrollbar
 
     utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
 
@@ -3095,6 +3102,7 @@ sections:Dropdown(info)
 
     return dropdown
 end
+
     --
     function sections:Multibox(info)
         local info = info or {}
