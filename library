@@ -2948,7 +2948,7 @@ function sections:Dropdown(info)
         Image = "https://i.imgur.com/SCROLL_DOWN_IMAGE_URL.png" -- Replace with your scroll down image URL
     }, section.visibleContent)
 
-    dropdown_scroll_button.MouseButton1Click:Connect(function()
+    Input.UserInputType == Enum.UserInputType.MouseButton1:Connect(function()
         dropdown_scroll_position = dropdown_scroll_position + maxVisibleOptions
         dropdown:UpdateOptions()
     end)
