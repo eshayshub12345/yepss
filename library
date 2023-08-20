@@ -2852,6 +2852,11 @@ function sections:Dropdown(info)
     local page = self.page
     local section = self
 
+    -- Scrollbar variables
+    local scrollPosition = 0
+    local maxScrollPosition = math.max(#options - maxVisibleOptions, 0)
+    local scrollbarWidth = 16
+
     local dropdown = { open = false, current = tostring(def), holder = { buttons = {}, drawings = {} }, axis = section.currentAxis }
 
     local dropdown_outline = utility:Create("Frame", { Vector2.new(4, dropdown.axis + 15), section.section_frame }, {
@@ -2908,20 +2913,29 @@ function sections:Dropdown(info)
         Visible = page.open
     }, section.visibleContent)
 
+    local scrollbar_frame = utility:Create("Frame", { Vector2.new(1, 1), dropdown_inline }, {
+        Size = utility:Size(0, scrollbarWidth, 1, -2, dropdown_inline),
+        Position = utility:Position(1, -scrollbarWidth, 0, 1, dropdown_inline),
+        Color = theme.scrollbarColor,
+        Visible = page.open
+    }, section.visibleContent)
+
     dropdown["dropdown_image"] = dropdown_image
 
     utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
 
+    -- Scrollbar buttons can be created here.
+
     function dropdown:ScrollUp()
-        if firstVisibleOption > 1 then
-            firstVisibleOption = firstVisibleOption - 1
+        if scrollPosition > 0 then
+            scrollPosition = scrollPosition - 1
             dropdown:Update()
         end
     end
 
     function dropdown:ScrollDown()
-        if firstVisibleOption + maxVisibleOptions - 1 < #options then
-            firstVisibleOption = firstVisibleOption + 1
+        if scrollPosition < maxScrollPosition then
+            scrollPosition = scrollPosition + 1
             dropdown:Update()
         end
     end
@@ -2929,7 +2943,7 @@ function sections:Dropdown(info)
     function dropdown:Update()
         if dropdown.open and dropdown.holder.inline then
             for i, v in pairs(dropdown.holder.buttons) do
-                local optionIndex = i + firstVisibleOption - 1
+                local optionIndex = i + firstVisibleOption - 1 + scrollPosition
                 local optionText = options[optionIndex]
 
                 if optionText then
@@ -2955,7 +2969,9 @@ function sections:Dropdown(info)
 
     function dropdown:Refresh(newOptions)
         options = newOptions
-        maxVisibleOptions = math.min(#options, 7)  -- Update the maximum visible options
+        maxVisibleOptions = math.min(#options, 7)
+        maxScrollPosition = math.max(#options - maxVisibleOptions, 0)
+        scrollPosition = math.min(scrollPosition, maxScrollPosition)
         dropdown:Update()
     end
 
