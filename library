@@ -2973,101 +2973,78 @@ function sections:Dropdown(info)
 
     library.began[#library.began + 1] = function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 and window.isVisible and dropdown_outline.Visible then
-            if dropdown.open and dropdown.holder.inline and utility:MouseOverDrawing({dropdown.holder.inline.Position.X, dropdown.holder.inline.Position.Y, dropdown.holder.inline.Position.X + dropdown.holder.inline.Size.X, dropdown.holder.inline.Position.Y + dropdown.holder.inline.Size.Y}) then
-                for i,v in pairs(dropdown.holder.buttons) do
-                    if utility:MouseOverDrawing({v[2].Position.X, v[2].Position.Y, v[2].Position.X + v[2].Size.X, v[2].Position.Y + v[2].Size.Y}) and v[1].Text ~= dropdown.current then
+            if dropdown.open and dropdown.holder.inline and utility:MouseOverDrawing({ dropdown.holder.inline.Position.X, dropdown.holder.inline.Position.Y, dropdown.holder.inline.Position.X + dropdown.holder.inline.Size.X, dropdown.holder.inline.Position.Y + dropdown.holder.inline.Size.Y }) then
+                for i, v in pairs(dropdown.holder.buttons) do
+                    if utility:MouseOverDrawing({ v[2].Position.X, v[2].Position.Y, v[2].Position.X + v[2].Size.X, v[2].Position.Y + v[2].Size.Y }) and v[1].Text ~= dropdown.current then
                         dropdown.current = v[1].Text
                         dropdown_value.Text = dropdown.current
-                        dropdown:Update()
+                        dropdown:UpdateOptions()
                         callback(dropdown.current)
                     end
                 end
-            elseif utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + dropdown.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + dropdown.axis + 15 +  20}) and not window:IsOverContent() then
+            elseif utility:MouseOverDrawing({ section.section_frame.Position.X, section.section_frame.Position.Y + dropdown.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + dropdown.axis + 15 + 20 }) and not window:IsOverContent() then
                 if not dropdown.open then
                     window:CloseContent()
                     dropdown.open = not dropdown.open
-                    utility:LoadImage(dropdown_image, "arrow_up", "https://i.imgur.com/SL9cbQp.png")
+                    utility:LoadImage(dropdown_image, "arrow_up", "https://i.imgur.com/SL9cbQp.png") -- Replace with your arrow up image URL
                     --
-                    local dropdown_open_outline = utility:Create("Frame", {Vector2.new(0,19), dropdown_outline}, {
-                        Size = utility:Size(1, 0, 0, 3 + (#options * 19), dropdown_outline),
+                    local dropdown_open_outline = utility:Create("Frame", { Vector2.new(0, 19), dropdown_outline }, {
+                        Size = utility:Size(1, 0, 0, 3 + (maxVisibleOptions * 19), dropdown_outline),
                         Position = utility:Position(0, 0, 0, 19, dropdown_outline),
                         Color = theme.outline,
                         Visible = page.open
-                    }, dropdown.holder.drawings);dropdown.holder.outline = dropdown_open_outline
+                    }, dropdown.holder.drawings)
+                    dropdown.holder.outline = dropdown_open_outline
                     --
-                    local dropdown_open_inline = utility:Create("Frame", {Vector2.new(1,1), dropdown_open_outline}, {
+                    local dropdown_open_inline = utility:Create("Frame", { Vector2.new(1, 1), dropdown_open_outline }, {
                         Size = utility:Size(1, -2, 1, -2, dropdown_open_outline),
                         Position = utility:Position(0, 1, 0, 1, dropdown_open_outline),
                         Color = theme.inline,
                         Visible = page.open
-                    }, dropdown.holder.drawings);dropdown.holder.inline = dropdown_open_inline
+                    }, dropdown.holder.drawings)
+                    dropdown.holder.inline = dropdown_open_inline
                     --
-                    for i,v in pairs(options) do
-                        local dropdown_value_frame = utility:Create("Frame", {Vector2.new(1,1 + (19 * (i-1))), dropdown_open_inline}, {
-                            Size = utility:Size(1, -2, 0, 18, dropdown_open_inline),
-                            Position = utility:Position(0, 1, 0, 1 + (19 * (i-1)), dropdown_open_inline),
-                            Color = theme.light_contrast,
-                            Visible = page.open
-                        }, dropdown.holder.drawings)
-                        local dropdown_value = utility:Create("TextLabel", {Vector2.new(v == tostring(dropdown.current) and 8 or 6,2), dropdown_value_frame}, {
-                            Text = v,
-                            Size = theme.textsize,
-                            Font = theme.font,
-                            Color = v == tostring(dropdown.current) and theme.accent or theme.textcolor,
-                            OutlineColor = theme.textborder,
-                            Position = utility:Position(0, v == tostring(dropdown.current) and 8 or 6, 0, 2, dropdown_value_frame),
-                            Visible = page.open
-                        }, dropdown.holder.drawings);dropdown.holder.buttons[#dropdown.holder.buttons + 1] = {dropdown_value, dropdown_value_frame}
-                    end
-                    --
+                    dropdown:UpdateOptions()
                     window.currentContent.frame = dropdown_open_inline
                     window.currentContent.dropdown = dropdown
-                    --
-                    dropdown:Update()
                 else
                     dropdown.open = not dropdown.open
-                    utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+                    utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png") -- Replace with your arrow down image URL
                     --
-                    for i,v in pairs(dropdown.holder.drawings) do
+                    for i, v in pairs(dropdown.holder.drawings) do
                         utility:Remove(v)
                     end
-                    --
                     dropdown.holder.drawings = {}
                     dropdown.holder.buttons = {}
                     dropdown.holder.inline = nil
-                    --
                     window.currentContent.frame = nil
                     window.currentContent.dropdown = nil
                 end
             else
                 if dropdown.open then
                     dropdown.open = not dropdown.open
-                    utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+                    utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png") -- Replace with your arrow down image URL
                     --
-                    for i,v in pairs(dropdown.holder.drawings) do
+                    for i, v in pairs(dropdown.holder.drawings) do
                         utility:Remove(v)
                     end
-                    --
                     dropdown.holder.drawings = {}
                     dropdown.holder.buttons = {}
                     dropdown.holder.inline = nil
-                    --
                     window.currentContent.frame = nil
                     window.currentContent.dropdown = nil
                 end
             end
         elseif Input.UserInputType == Enum.UserInputType.MouseButton1 and dropdown.open then
             dropdown.open = not dropdown.open
-            utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+            utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png") -- Replace with your arrow down image URL
             --
-            for i,v in pairs(dropdown.holder.drawings) do
+            for i, v in pairs(dropdown.holder.drawings) do
                 utility:Remove(v)
             end
-            --
             dropdown.holder.drawings = {}
             dropdown.holder.buttons = {}
             dropdown.holder.inline = nil
-            --
             window.currentContent.frame = nil
             window.currentContent.dropdown = nil
         end
@@ -3075,7 +3052,7 @@ function sections:Dropdown(info)
 
     library.changed[#library.changed + 1] = function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseMovement and dropdown_outline.Visible and window.isVisible then
-            if utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + dropdown.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + dropdown.axis + 15 +  20}) and not window:IsOverContent() then
+            if utility:MouseOverDrawing({ section.section_frame.Position.X, section.section_frame.Position.Y + dropdown.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + dropdown.axis + 15 + 20 }) and not window:IsOverContent() then
                 local h, s, v = theme.accent:ToHSV()
                 dropdown_inline.Color = Color3.fromHSV(h, 0.44, v)
             else
@@ -3090,6 +3067,8 @@ function sections:Dropdown(info)
 
     section.currentAxis = section.currentAxis + 35 + 4
     section:Update()
+
+    dropdown:UpdateOptions()
 
     return dropdown
 end
