@@ -2962,31 +2962,18 @@ end
 	                --
 	                dropdown:Update()
 	            else
-	                dropdown.open = not dropdown.open
-	                utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
-	                --
-	                for i,v in pairs(dropdown.holder.drawings) do
-	                    utility:Remove(v)
-	                end
-	                --
-	                dropdown.holder.drawings = {}
-	                dropdown.holder.buttons = {}
-	                --
-	                window.currentContent.frame = nil
-	                window.currentContent.dropdown
-		else
-	                dropdown.open = not dropdown.open
-	                utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
-	                --
-	                for i,v in pairs(dropdown.holder.drawings) do
-	                    utility:Remove(v)
-	                end
-	                --
-	                dropdown.holder.drawings = {}
-	                dropdown.holder.buttons = {}
-	                --
-	                window.currentContent.frame = nil
-	                window.currentContent.dropdown = nil
+					dropdown.open = not dropdown.open
+					utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+					--
+					for i,v in pairs(dropdown.holder.drawings) do
+						utility:Remove(v)
+					end
+					--
+					dropdown.holder.drawings = {}
+					dropdown.holder.buttons = {}
+					--
+					window.currentContent.frame = nil
+					window.currentContent.dropdown = nil
 	            end
 	        end
 	    end
