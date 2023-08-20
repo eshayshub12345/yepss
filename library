@@ -2907,51 +2907,46 @@ end
        -- utility:LoadImage(dropdown__gradient, "gradient", "https://i.imgur.com/5hmlrjX.png")
         --
         function dropdown:Update()
-			if dropdown.open and dropdown.holder.inline then
-				--
-				for i,v in pairs(dropdown.holder.buttons) do
-					v[1].Position = utility:Position(0, v[1].Text == tostring(dropdown.current) and 8 or 6, 0, 2, v[2])
-					utility:UpdateOffset(v[1], {Vector2.new(v[1].Text == tostring(dropdown.current) and 8 or 6, 2), v[2]})
-				end
-				--
-				local max_options = 7
-				local scroll_y = 0
-				if #dropdown.holder.buttons > max_options then
-					scroll_y = math.floor(#dropdown.holder.buttons / max_options)
-				end
-				for i = 1, max_options do
-					if i + scroll_y <= #dropdown.holder.buttons then
-						dropdown.holder.buttons[i][2].Position = utility:Position(0, 1 + (19 * (i - 1)), 0, 1 + (19 * (i - 1)), dropdown.holder.inline)
-					else
-						dropdown.holder.buttons[i][2].Visible = false
-					end
-				end
-				if #dropdown.holder.buttons > max_options and not dropdown.holder.buttons[max_options][2].Visible then
-					local scroll_up = utility:Create("ImageButton", {Vector2.new(1,0), dropdown_open_inline}, {
-						Size = utility:Size(0, 16, 0, 16, dropdown_open_inline),
-						Position = utility:Position(0, -16, 0.5, -4, dropdown_open_inline),
-						Image = "rbxassetid://8829644633",
-						Visible = page.open
-					}, dropdown.holder.drawings)
-					utility:AddInputListener(scroll_up, function(Input)
-						if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-							if scroll_y > 0 then
-								scroll_y = scroll_y - 1
-								for i = 1, max_options do
-									dropdown.holder.buttons[i][2].Position = utility:Position(0, 1 + (19 * (i - 1)), 0, 1 + (19 * (i - 1)), dropdown.holder.inline)
-								end
-							end
-						end
-					end)
-					dropdown.holder.buttons[max_options][2] = scroll_up
-				end
-				if #dropdown.holder.buttons <= max_options then
-					scroll_up:Remove()
-				end
-			end
-		end
-
-        --
+	    if dropdown.open and dropdown.holder.inline then
+	        --
+	        for i,v in pairs(dropdown.holder.buttons) do
+	            v[1].Position = utility:Position(0, v[1].Text == tostring(dropdown.current) and 8 or 6, 0, 2, v[2])
+	            utility:UpdateOffset(v[1], {Vector2.new(v[1].Text == tostring(dropdown.current) and 8 or 6, 2), v[2]})
+	        end
+	        --
+	        local max_options = 7
+	        local scroll_y = 0
+	        if #dropdown.holder.buttons > max_options then
+	            scroll_y = math.floor(#dropdown.holder.buttons / max_options)
+	        end
+	        for i = 1, max_options do
+	            if i + scroll_y <= #dropdown.holder.buttons then
+	                dropdown.holder.buttons[i][2].Position = utility:Position(0, 1 + (19 * (i - 1)), 0, 1 + (19 * (i - 1)), dropdown.holder.inline)
+	            else
+	                if not dropdown.holder.buttons[i][2].Visible then
+	                    local scroll_up = utility:Create("ImageButton", {Vector2.new(1,0), dropdown_open_inline}, {
+	                        Size = utility:Size(0, 16, 0, 16, dropdown_open_inline),
+	                        Position = utility:Position(0, -16, 0.5, -4, dropdown_open_inline),
+	                        Image = "rbxassetid://8829644633",
+	                        Visible = page.open
+	                    }, dropdown.holder.drawings)
+	                    utility:AddInputListener(scroll_up, function(Input)
+	                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+	                            if scroll_y > 0 then
+	                                scroll_y = scroll_y - 1
+	                                for i = 1, max_options do
+	                                    dropdown.holder.buttons[i][2].Position = utility:Position(0, 1 + (19 * (i - 1)), 0, 1 + (19 * (i - 1)), dropdown.holder.inline)
+	                                end
+	                            end
+	                        end
+	                    end)
+	                    dropdown.holder.buttons[max_options][2] = scroll_up
+	                end
+	            end
+	        end
+	    end
+	end
+	        --
         function dropdown:Set(value)
             if typeof(value) == "string" and table.find(options, value) then
                 dropdown.current = value
