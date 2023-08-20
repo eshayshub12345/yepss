@@ -2843,6 +2843,7 @@ function sections:Dropdown(info)
     local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
     local callback = info.callback or info.callBack or info.Callback or info.CallBack or function() end
 
+    local firstVisibleOption = 1
     local maxVisibleOptions = 7
     local dropdownScrollOffset = 0
     local dropdownValueIndex = 1  -- Index of the selected option
@@ -2911,36 +2912,39 @@ function sections:Dropdown(info)
 
     utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
 
-    function dropdown:ScrollUp()
-        if dropdownScrollOffset > 0 then
-            dropdownScrollOffset = dropdownScrollOffset - 1
-            dropdown:Update()
-        end
-    end
+	function dropdown:ScrollUp()
+	    if firstVisibleOption > 1 then
+	        firstVisibleOption = firstVisibleOption - 1
+	        dropdown:Update()
+	    end
+	end
+	
+	function dropdown:ScrollDown()
+	    if firstVisibleOption + maxVisibleOptions - 1 < #options then
+	        firstVisibleOption = firstVisibleOption + 1
+	        dropdown:Update()
+	    end
+	end
 
-    function dropdown:ScrollDown()
-        if dropdownScrollOffset < #options - maxVisibleOptions then
-            dropdownScrollOffset = dropdownScrollOffset + 1
-            dropdown:Update()
-        end
-    end
+	function dropdown:Update()
+	    if dropdown.open and dropdown.holder.inline then
+	        for i, v in pairs(dropdown.holder.buttons) do
+	            local optionIndex = i + firstVisibleOption - 1
+	            local optionText = options[optionIndex]
+	
+	            if optionText then
+	                v[1].Text = optionText
+	                v[1].Color = optionText == dropdown.current and theme.accent or theme.textcolor
+	                v[1].Position = utility:Position(0, optionText == dropdown.current and 8 or 6, 0, 2, v[2])
+	                v[2].Visible = true
+	            else
+	                v[1].Text = ""
+	                v[2].Visible = false
+	            end
+	        end
+	    end
+	end
 
-    function dropdown:Update()
-        if dropdown.open and dropdown.holder.inline then
-            for i, v in pairs(dropdown.holder.buttons) do
-                local optionIndex = i + dropdownScrollOffset
-                local optionText = options[optionIndex]
-
-                if optionText then
-                    v[1].Text = optionText
-                    v[1].Color = optionText == dropdown.current and theme.accent or theme.textcolor
-                    v[1].Position = utility:Position(0, optionText == dropdown.current and 8 or 6, 0, 2, v[2])
-                else
-                    v[1].Text = ""
-                end
-            end
-        end
-    end
 
     function dropdown:Set(value)
         if typeof(value) == "string" and table.find(options, value) then
@@ -2961,17 +2965,17 @@ function sections:Dropdown(info)
     library.began[#library.began + 1] = function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 and window.isVisible and dropdown_outline.Visible then
             if dropdown.open and dropdown.holder.inline and utility:MouseOverDrawing({ dropdown.holder.inline.Position.X, dropdown.holder.inline.Position.Y, dropdown.holder.inline.Position.X + dropdown.holder.inline.Size.X, dropdown.holder.inline.Position.Y + dropdown.holder.inline.Size.Y }) then
-                for i, v in pairs(dropdown.holder.buttons) do
-                    local optionIndex = i + dropdownScrollOffset
-                    local optionText = options[optionIndex]
-
-                    if optionText and utility:MouseOverDrawing({ v[2].Position.X, v[2].Position.Y, v[2].Position.X + v[2].Size.X, v[2].Position.Y + v[2].Size.Y }) and optionText ~= dropdown.current then
-                        dropdown.current = optionText
-                        dropdown_value.Text = optionText
-                        dropdown:Update()
-                        callback(optionText)
-                    end
-                end
+		for i, v in pairs(dropdown.holder.buttons) do
+		    local optionIndex = i + firstVisibleOption - 1
+		    local optionText = options[optionIndex]
+		
+		    if optionText and utility:MouseOverDrawing({ v[2].Position.X, v[2].Position.Y, v[2].Position.X + v[2].Size.X, v[2].Position.Y + v[2].Size.Y }) and optionText ~= dropdown.current then
+		        dropdown.current = optionText
+		        dropdown_value.Text = optionText
+		        dropdown:Update()
+		        callback(optionText)
+		    end
+		end
             elseif utility:MouseOverDrawing({ section.section_frame.Position.X, section.section_frame.Position.Y + dropdown.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + dropdown.axis + 15 + 20 }) and not window:IsOverContent() then
                 if not dropdown.open then
                     window:CloseContent()
