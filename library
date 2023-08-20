@@ -2907,11 +2907,12 @@ function sections:Dropdown(info)
         Visible = page.open
     }, section.visibleContent)
 
-    local dropdown_image = utility:Create("Image", { Vector2.new(dropdown_frame.Size.X.Offset - 15, dropdown_frame.Size.Y.Offset / 2 - 3), dropdown_frame }, {
-        Size = utility:Size(0, 9, 0, 6, dropdown_frame),
-        Position = utility:Position(1, -15, 0.5, -3, dropdown_frame),
-        Visible = page.open
-    }, section.visibleContent)
+    local dropdown_image = utility:Create("Image", {
+    Position = UDim2.new(0, dropdown_frame.Size.X.Offset - 15, 0, dropdown_frame.Size.Y.Offset / 2 - 3),
+    Parent = dropdown_frame,
+    Size = utility:Size(0, 9, 0, 6, dropdown_frame),
+    Visible = page.open
+}, section.visibleContent)
 
     dropdown["dropdown_image"] = dropdown_image
 
