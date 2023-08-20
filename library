@@ -2907,23 +2907,23 @@ function sections:Dropdown(info)
 
     utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
 
-    function dropdown:Update()
-        local dropdown_connect
-        if dropdown.open and dropdown.holder.inline then
-            for i, v in pairs(dropdown.holder.buttons) do
-                v[1].Color = v[1].Text == tostring(dropdown.current) and theme.accent or theme.textcolor
-                local dropdown_connect = rs.RenderStepped:Connect(function()
-                    if dropdown.open and v[1].Text == tostring(dropdown.current) then
-                        v[1].Color = theme.accent
-                    else
-                        dropdown_connect:Disconnect()
-                    end
-                end)
-                v[1].Position = utility:Position(0, v[1].Text == tostring(dropdown.current) and 8 or 6, 0, 2, v[2])
-                utility:UpdateOffset(v[1], { Vector2.new(v[1].Text == tostring(dropdown.current) and 8 or 6, 2), v[2] })
-            end
-        end
-    end
+	function dropdown:Update()
+	    local dropdown_connect
+	    if dropdown.open and dropdown.holder.inline then
+	        for i, v in pairs(dropdown.holder.buttons) do
+	            v[1].Color = v[1].Text == tostring(dropdown.current) and theme.accent or theme.textcolor
+	            dropdown_connect = rs.RenderStepped:Connect(function()
+	                if dropdown.open and v[1].Text == tostring(dropdown.current) then
+	                    v[1].Color = theme.accent
+	                else
+	                    dropdown_connect:Disconnect()
+	                end
+	            end)
+	            v[1].Position = utility:Position(0, v[1].Text == tostring(dropdown.current) and 8 or 6, 0, 2, v[2])
+	            utility:UpdateOffset(v[1], { Vector2.new(v[1].Text == tostring(dropdown.current) and 8 or 6, 2), v[2] })
+	        end
+	    end
+	end
 
     function dropdown:Set(value)
         if typeof(value) == "string" and table.find(options, value) then
