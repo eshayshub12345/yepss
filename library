@@ -2995,8 +2995,6 @@ function sections:Dropdown(info)
 	    Color = theme.textcolor,
 	    OutlineColor = theme.textborder,
 	    Position = utility:Position(1, -18, 0, 1 + dropdown.axis, section.section_frame),
-	    TextStrokeTransparency = 0,
-	    TextXAlignment = Enum.TextXAlignment.Right, -- Use Enum.TextXAlignment to set alignment
 	    Visible = page.open
 	}, section.visibleContent)
 
