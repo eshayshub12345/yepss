@@ -2874,13 +2874,6 @@ function sections:Dropdown(info)
         Visible = page.open,
     }, section.visibleContent)
 
-    -- Create a ScrollingFrame for the dropdown options
-    local scrollingFrame = utility:Create("ScrollingFrame", {Vector2.new(1, 1), dropdown_frame}, {
-        Size = utility:Size(1, 0, 1, 0, dropdown_frame), -- Full size of the dropdown_frame
-        Position = utility:Position(0, 0, 0, 0, dropdown_frame),
-        ScrollBarImageColor3 = theme.accent, -- Customize scrollbar color
-    }, dropdown_frame)
-
     local dropdown_title = utility:Create("TextLabel", {Vector2.new(4, dropdown.axis), section.section_frame}, {
         Text = name,
         Size = theme.textsize,
@@ -2891,22 +2884,39 @@ function sections:Dropdown(info)
         Visible = page.open
     }, section.visibleContent)
 
-    local dropdown__gradient = utility:Create("Image", {Vector2.new(0, 0), dropdown_frame}, {
-        Size = utility:Size(1, 0, 1, 0, dropdown_frame),
-        Position = utility:Position(0, 0, 0 , 0, dropdown_frame),
-        Transparency = 0.5,
-        Visible = page.open
-    }, section.visibleContent)
+    function dropdown:CreateScrollingFrame()
+        local scrollingFrameHeight = math.min(#options, maxVisibleOptions) * dropdownOptionHeight
 
-    local dropdown_value = utility:Create("TextLabel", {Vector2.new(3, dropdownFrameHeight / 2 - 7), dropdown_frame}, {
-        Text = dropdown.current,
-        Size = theme.textsize,
-        Font = theme.font,
-        Color = theme.textcolor,
-        OutlineColor = theme.textborder,
-        Position = utility:Position(0, 3, 0, (dropdownFrameHeight / 2) - 7, dropdown_frame),
-        Visible = page.open
-    }, section.visibleContent)
+        local scrollingFrame = utility:Create("ScrollingFrame", {Vector2.new(1, 1), dropdown_frame}, {
+            Size = utility:Size(1, 0, 0, scrollingFrameHeight, dropdown_frame), -- Adjust the height
+            Position = utility:Position(0, 0, 0, 0, dropdown_frame),
+            ScrollBarImageColor3 = theme.accent,
+            CanvasSize = UDim2.new(0, 0, 0, #options * dropdownOptionHeight), -- Set the canvas size
+        }, dropdown_frame)
+
+        for i, v in pairs(options) do
+            if i <= maxVisibleOptions then -- Only add visible options
+                local dropdown_value_frame = utility:Create("Frame", {Vector2.new(1, 1 + (19 * (i - 1))), scrollingFrame}, {
+                    Size = utility:Size(1, -2, 0, 18, scrollingFrame),
+                    Position = utility:Position(0, 1, 0, 1 + (19 * (i - 1)), scrollingFrame),
+                    Color = theme.light_contrast,
+                }, scrollingFrame)
+
+                local dropdown_value = utility:Create("TextLabel", {Vector2.new(v == tostring(dropdown.current) and 8 or 6, 2), dropdown_value_frame}, {
+                    Text = v,
+                    Size = theme.textsize,
+                    Font = theme.font,
+                    Color = v == tostring(dropdown.current) and theme.accent or theme.textcolor,
+                    OutlineColor = theme.textborder,
+                    Position = utility:Position(0, v == tostring(dropdown.current) and 8 or 6, 0, 2, dropdown_value_frame),
+                }, scrollingFrame)
+
+                dropdown.holder.buttons[#dropdown.holder.buttons + 1] = {dropdown_value, dropdown_value_frame}
+            end
+        end
+
+        return scrollingFrame
+    end
 
     local dropdown_image = utility:Create("Image", {Vector2.new(dropdown_frame.Size.X - 15, dropdownFrameHeight / 2 - 3), dropdown_frame}, {
         Size = utility:Size(0, 9, 0, 6, dropdown_frame),
@@ -2945,7 +2955,7 @@ function sections:Dropdown(info)
 
     function dropdown:Refresh(newOptions)
         options = newOptions
-        updateCanvasSize() -- Update the CanvasSize when options change
+        dropdown_frame.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, #options * dropdownOptionHeight) -- Update the CanvasSize when options change
     end
 
     function dropdown:Get()
@@ -3077,6 +3087,7 @@ function sections:Dropdown(info)
 
     return dropdown
 end
+
 
     --
     function sections:Multibox(info)
