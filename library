@@ -2835,7 +2835,7 @@ end
         return textbox
     end
     --
-  function sections:Dropdown(info)
+function sections:Dropdown(info)
     local info = info or {}
     local name = info.name or info.Name or info.title or info.Title or "New Dropdown"
     local options = info.options or info.Options or {"1", "2", "3"}
@@ -2872,8 +2872,14 @@ end
         Position = utility:Position(0, 1, 0, 1, dropdown_inline),
         Color = theme.light_contrast,
         Visible = page.open,
-        ClipsDescendants = true -- Enable clipping for scrolling
     }, section.visibleContent)
+
+    -- Create a ScrollingFrame for the dropdown options
+    local scrollingFrame = utility:Create("ScrollingFrame", {Vector2.new(1, 1), dropdown_frame}, {
+        Size = utility:Size(1, 0, 1, 0, dropdown_frame), -- Full size of the dropdown_frame
+        Position = utility:Position(0, 0, 0, 0, dropdown_frame),
+        ScrollBarImageColor3 = theme.accent, -- Customize scrollbar color
+    }, dropdown_frame)
 
     local dropdown_title = utility:Create("TextLabel", {Vector2.new(4, dropdown.axis), section.section_frame}, {
         Text = name,
