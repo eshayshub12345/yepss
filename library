@@ -2913,16 +2913,16 @@ function sections:Dropdown(info)
         Visible = page.open
     }, section.visibleContent)
 
+    dropdown["dropdown_image"] = dropdown_image
+
+    utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+
     local scrollbar_frame = utility:Create("Frame", { Vector2.new(1, 1), dropdown_inline }, {
         Size = utility:Size(0, scrollbarWidth, 1, -2, dropdown_inline),
         Position = utility:Position(1, -scrollbarWidth, 0, 1, dropdown_inline),
         Color = theme.scrollbarColor,
         Visible = page.open
     }, section.visibleContent)
-
-    dropdown["dropdown_image"] = dropdown_image
-
-    utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
 
     -- Scrollbar buttons can be created here.
 
