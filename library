@@ -2835,7 +2835,7 @@ end
         return textbox
     end
     --
-function sections:Dropdown(info)
+sections:Dropdown(info)
     local info = info or {}
     local name = info.name or info.Name or info.title or info.Title or "New Dropdown"
     local options = info.options or info.Options or {"1", "2", "3"}
@@ -2999,7 +2999,7 @@ function sections:Dropdown(info)
                     dropdown.holder.inline = dropdown_open_inline
 
                     for i, v in pairs(options) do
-                        local optionIndex = i + firstVisibleOption - 1
+                        local optionIndex = i + dropdownScrollOffset
                         local optionText = options[optionIndex]
 
                         if optionText and i <= maxVisibleOptions then
@@ -3095,8 +3095,6 @@ function sections:Dropdown(info)
 
     return dropdown
 end
-
-
     --
     function sections:Multibox(info)
         local info = info or {}
