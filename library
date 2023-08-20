@@ -3095,7 +3095,6 @@ sections:Dropdown(info)
 
     return dropdown
 end
-
     --
     function sections:Multibox(info)
         local info = info or {}
