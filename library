@@ -2835,133 +2835,225 @@ end
         return textbox
     end
     --
-  function sections:Dropdown(info)
-local info = info or {}
-    local name = info.name or info.Name or info.title or info.Title or "New Dropdown"
-    local options = info.options or info.Options or {"1", "2", "3"}
-    local def = info.def or info.Def or info.default or info.Default or options[1]
-    local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
-    local callback = info.callback or info.callBack or info.Callback or info.CallBack or function() end
-    --
-    local window = self.window
-    local page = self.page
-    local section = self
-    --
-    local dropdown = {
-        open = false,
-        current = tostring(def),
-        holder = {
-            buttons = {},
-            drawings = {},
-        },
-        axis = section.currentAxis,
-    }
-
-    function dropdown:Update()
-        -- Update the dropdown's state.
-        local num_options = #options
-        if num_options > 7 then
-          -- The dropdown has more than 7 options, so we need to add a scrollbar.
-          local scrollbar = utility:Create("Frame", {Vector2.new(0,18), dropdown_open_inline}, {
-            Size = utility:Size(1, 0, 0, 18),
-            Position = utility:Position(0, 0, 0, 18, dropdown_open_inline),
+    function sections:Dropdown(info)
+        local info = info or {}
+        local name = info.name or info.Name or info.title or info.Title or "New Dropdown"
+        local options = info.options or info.Options or {"1", "2", "3"}
+        local def = info.def or info.Def or info.default or info.Default or options[1]
+        local pointer = info.pointer or info.Pointer or info.flag or info.Flag or nil
+        local callback = info.callback or info.callBack or info.Callback or info.CallBack or function() end
+        --
+        local window = self.window
+        local page = self.page
+        local section = self
+        --
+        local dropdown = {open = false, current = tostring(def), holder = {buttons = {}, drawings = {}}, axis = section.currentAxis}
+        --
+        local dropdown_outline = utility:Create("Frame", {Vector2.new(4,dropdown.axis + 15), section.section_frame}, {
+            Size = utility:Size(1, -8, 0, 20, section.section_frame),
+            Position = utility:Position(0, 4, 0, dropdown.axis + 15, section.section_frame),
             Color = theme.outline,
             Visible = page.open
-          }, dropdown.holder.drawings)
-          local scrollbar_value = utility:Create("TextLabel", {Vector2.new(0, 0), scrollbar}, {
-            Text = tostring(math.floor(dropdown.current_index / 7)),
-            Size = utility:Size(1, -8, 0, 8, scrollbar),
-            Position = utility:Position(0, 0, 0, 0, scrollbar),
+        }, section.visibleContent)
+        --
+        local dropdown_inline = utility:Create("Frame", {Vector2.new(1,1), dropdown_outline}, {
+            Size = utility:Size(1, -2, 1, -2, dropdown_outline),
+            Position = utility:Position(0, 1, 0, 1, dropdown_outline),
+            Color = theme.inline,
+            Visible = page.open
+        }, section.visibleContent)
+        --
+        local dropdown_frame = utility:Create("Frame", {Vector2.new(1,1), dropdown_inline}, {
+            Size = utility:Size(1, -2, 1, -2, dropdown_inline),
+            Position = utility:Position(0, 1, 0, 1, dropdown_inline),
+            Color = theme.light_contrast,
+            Visible = page.open
+        }, section.visibleContent)
+        --
+        local dropdown_title = utility:Create("TextLabel", {Vector2.new(4,dropdown.axis), section.section_frame}, {
+            Text = name,
+            Size = theme.textsize,
+            Font = theme.font,
             Color = theme.textcolor,
             OutlineColor = theme.textborder,
+            Position = utility:Position(0, 4, 0, dropdown.axis, section.section_frame),
             Visible = page.open
-          }, dropdown.holder.drawings)
-          --
-          local scrollbar_connection = rs.RenderStepped:Connect(function()
-            scrollbar_value.Text = tostring(math.floor(dropdown.current_index / 7))
-          end)
-        else
-          -- The dropdown has less than or equal to 7 options, so we don't need a scrollbar.
-          for i,v in pairs(dropdown.holder.drawings) do
-            if v == scrollbar or v == scrollbar_value then
-              utility:Remove(v)
+        }, section.visibleContent)
+        --
+        local dropdown__gradient = utility:Create("Image", {Vector2.new(0,0), dropdown_frame}, {
+            Size = utility:Size(1, 0, 1, 0, dropdown_frame),
+            Position = utility:Position(0, 0, 0 , 0, dropdown_frame),
+            Transparency = 0.5,
+            Visible = page.open
+        }, section.visibleContent)
+        --
+        local dropdown_value = utility:Create("TextLabel", {Vector2.new(3,dropdown_frame.Size.Y/2 - 7), dropdown_frame}, {
+            Text = dropdown.current,
+            Size = theme.textsize,
+            Font = theme.font,
+            Color = theme.textcolor,
+            OutlineColor = theme.textborder,
+            Position = utility:Position(0, 3, 0, (dropdown_frame.Size.Y/2) - 7, dropdown_frame),
+            Visible = page.open
+        }, section.visibleContent)
+        --
+        local dropdown_image = utility:Create("Image", {Vector2.new(dropdown_frame.Size.X - 15,dropdown_frame.Size.Y/2 - 3), dropdown_frame}, {
+            Size = utility:Size(0, 9, 0, 6, dropdown_frame),
+            Position = utility:Position(1, -15, 0.5, -3, dropdown_frame),
+            Visible = page.open
+        }, section.visibleContent);dropdown["dropdown_image"] = dropdown_image
+        --
+        utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+       -- utility:LoadImage(dropdown__gradient, "gradient", "https://i.imgur.com/5hmlrjX.png")
+        --
+        function dropdown:Update()
+			if dropdown.open and dropdown.holder.inline then
+				--
+				for i,v in pairs(dropdown.holder.buttons) do
+					v[1].Position = utility:Position(0, v[1].Text == tostring(dropdown.current) and 8 or 6, 0, 2, v[2])
+					utility:UpdateOffset(v[1], {Vector2.new(v[1].Text == tostring(dropdown.current) and 8 or 6, 2), v[2]})
+				end
+				--
+				local max_options = 7
+				local scroll_y = 0
+				if #dropdown.holder.buttons > max_options then
+					scroll_y = math.floor(#dropdown.holder.buttons / max_options)
+				end
+				for i = 1, max_options do
+					if i + scroll_y <= #dropdown.holder.buttons then
+						dropdown.holder.buttons[i][2].Position = utility:Position(0, 1 + (19 * (i - 1)), 0, 1 + (19 * (i - 1)), dropdown.holder.inline)
+					else
+						dropdown.holder.buttons[i][2].Visible = false
+					end
+				end
+				if #dropdown.holder.buttons > max_options and not dropdown.holder.buttons[max_options][2].Visible then
+					local scroll_up = utility:Create("ImageButton", {Vector2.new(1,0), dropdown_open_inline}, {
+						Size = utility:Size(0, 16, 0, 16, dropdown_open_inline),
+						Position = utility:Position(0, -16, 0.5, -4, dropdown_open_inline),
+						Image = "rbxassetid://8829644633",
+						Visible = page.open
+					}, dropdown.holder.drawings)
+					utility:AddInputListener(scroll_up, function(Input)
+						if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+							if scroll_y > 0 then
+								scroll_y = scroll_y - 1
+								for i = 1, max_options do
+									dropdown.holder.buttons[i][2].Position = utility:Position(0, 1 + (19 * (i - 1)), 0, 1 + (19 * (i - 1)), dropdown.holder.inline)
+								end
+							end
+						end
+					end)
+					dropdown.holder.buttons[max_options][2] = scroll_up
+				end
+				if #dropdown.holder.buttons <= max_options then
+					scroll_up:Remove()
+				end
+			end
+		end
+
+        --
+        function dropdown:Set(value)
+            if typeof(value) == "string" and table.find(options, value) then
+                dropdown.current = value
+                dropdown_value.Text = value
+                callback(value)
             end
-          end
         end
-    end
-
-    function dropdown:Set(value)
-        -- Set the dropdown's value.
-        dropdown.current = value
-        dropdown_value.Text = value
-        dropdown:Update()
-        callback(value)
-    end
-
-    function dropdown:Refresh(newOptions)
-        -- Refresh the dropdown's options.
-        options = newOptions
-        dropdown:Update()
-    end
-
-    function dropdown:Get()
-        -- Get the dropdown's value.
-        return dropdown.current
-    end
-    --
-    library.began[#library.began + 1] = function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1 and window.isVisible and dropdown_outline.Visible then
-            if dropdown.open and dropdown.holder.inline and utility:MouseOverDrawing({dropdown.holder.inline.Position.X, dropdown.holder.inline.Position.Y, dropdown.holder.inline.Position.X + dropdown.holder.inline.Size.X, dropdown.holder.inline.Position.Y + dropdown.holder.inline.Size.Y}) then
-                for i,v in pairs(dropdown.holder.buttons) do
-                     if utility:MouseOverDrawing({v[2].Position.X, v[2].Position.Y, v[2].Position.X + v[2].Size.X, v[2].Position.Y + v[2].Size.Y}) and v[1].Text ~= dropdown.current then
-			 dropdown.current = v[1].Text
-                dropdown_value.Text = dropdown.current
-                dropdown:Update()
-                callback(dropdown.current)
-            end
+        --
+        function dropdown:Refresh(newOptions)
+            options = newOptions
         end
-        elseif utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + dropdown.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + dropdown.axis + 15 +  20}) and not window:IsOverContent() then
-            if not dropdown.open then
-                window:CloseContent()
-                dropdown.open = not dropdown.open
-                utility:LoadImage(dropdown_image, "arrow_up", "https://i.imgur.com/SL9cbQp.png")
-                --
-                local dropdown_open_outline = utility:Create("Frame", {Vector2.new(0,19), dropdown_outline}, {
-                    Size = utility:Size(1, 0, 0, 3 + (#options * 19), dropdown_outline),
-                    Position = utility:Position(0, 0, 0, 19, dropdown_outline),
-                    Color = theme.outline,
-                    Visible = page.open
-                }, dropdown.holder.drawings)
-                --
-                local dropdown_open_inline = utility:Create("Frame", {Vector2.new(1,1), dropdown_open_outline}, {
-                    Size = utility:Size(1, -2, 1, -2, dropdown_open_outline),
-                    Position = utility:Position(0, 1, 0, 1, dropdown_open_outline),
-                    Color = theme.inline,
-                    Visible = page.open
-                }, dropdown.holder.drawings)
-                --
-                for i,v in pairs(options) do
-                    local dropdown_value_frame = utility:Create("Frame", {Vector2.new(1,1 + (19 * (i-1))), dropdown_open_inline}, {
-                        Size = utility:Size(1, -2, 0, 18, dropdown_open_inline),
-                        Position = utility:Position(0, 1, 0, 1 + (19 * (i-1)), dropdown_open_inline),
-                        Color = theme.light_contrast,
-                        Visible = page.open
-                    }, dropdown.holder.drawings)
-                    local dropdown_value = utility:Create("TextLabel", {Vector2.new(v == tostring(dropdown.current) and 8 or 6,2), dropdown_value_frame}, {
-                        Text = v,
-                        Size = utility:Size(1, -8, 0, 8, dropdown_value_frame),
-                        Position = utility:Position(0, v == tostring(dropdown.current) and 8 or 6, 0, 2, dropdown_value_frame),
-                        Color = v == tostring(dropdown.current) and theme.accent or theme.textcolor,
-                        OutlineColor = theme.textborder,
-                        Visible = page.open
-                    }, dropdown.holder.drawings);dropdown.holder.buttons[#dropdown.holder.buttons + 1] = {dropdown_value, dropdown_value_frame}
+        --
+        function dropdown:Get()
+            return dropdown.current
+        end
+        --
+        library.began[#library.began + 1] = function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseButton1 and window.isVisible and dropdown_outline.Visible then
+                if dropdown.open and dropdown.holder.inline and utility:MouseOverDrawing({dropdown.holder.inline.Position.X, dropdown.holder.inline.Position.Y, dropdown.holder.inline.Position.X + dropdown.holder.inline.Size.X, dropdown.holder.inline.Position.Y + dropdown.holder.inline.Size.Y}) then
+                    for i,v in pairs(dropdown.holder.buttons) do
+                        if utility:MouseOverDrawing({v[2].Position.X, v[2].Position.Y, v[2].Position.X + v[2].Size.X, v[2].Position.Y + v[2].Size.Y}) and v[1].Text ~= dropdown.current then
+                            dropdown.current = v[1].Text
+                            dropdown_value.Text = dropdown.current
+                            dropdown:Update()
+                            callback(dropdown.current)
+                        end
+                    end
+                elseif utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + dropdown.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + dropdown.axis + 15 +  20}) and not window:IsOverContent() then
+                    if not dropdown.open then
+                        window:CloseContent()
+                        dropdown.open = not dropdown.open
+                        utility:LoadImage(dropdown_image, "arrow_up", "https://i.imgur.com/SL9cbQp.png")
+                        --
+                        local dropdown_open_outline = utility:Create("Frame", {Vector2.new(0,19), dropdown_outline}, {
+                            Size = utility:Size(1, 0, 0, 3 + (#options * 19), dropdown_outline),
+                            Position = utility:Position(0, 0, 0, 19, dropdown_outline),
+                            Color = theme.outline,
+                            Visible = page.open
+                        }, dropdown.holder.drawings);dropdown.holder.outline = dropdown_open_outline
+                        --
+                        local dropdown_open_inline = utility:Create("Frame", {Vector2.new(1,1), dropdown_open_outline}, {
+                            Size = utility:Size(1, -2, 1, -2, dropdown_open_outline),
+                            Position = utility:Position(0, 1, 0, 1, dropdown_open_outline),
+                            Color = theme.inline,
+                            Visible = page.open
+                        }, dropdown.holder.drawings);dropdown.holder.inline = dropdown_open_inline
+                        --
+                        for i,v in pairs(options) do
+                            local dropdown_value_frame = utility:Create("Frame", {Vector2.new(1,1 + (19 * (i-1))), dropdown_open_inline}, {
+                                Size = utility:Size(1, -2, 0, 18, dropdown_open_inline),
+                                Position = utility:Position(0, 1, 0, 1 + (19 * (i-1)), dropdown_open_inline),
+                                Color = theme.light_contrast,
+                                Visible = page.open
+                            }, dropdown.holder.drawings)
+                            local dropdown_value = utility:Create("TextLabel", {Vector2.new(v == tostring(dropdown.current) and 8 or 6,2), dropdown_value_frame}, {
+                                Text = v,
+                                Size = theme.textsize,
+                                Font = theme.font,
+                                Color = v == tostring(dropdown.current) and theme.accent or theme.textcolor,
+                                OutlineColor = theme.textborder,
+                                Position = utility:Position(0, v == tostring(dropdown.current) and 8 or 6, 0, 2, dropdown_value_frame),
+                                Visible = page.open
+                            }, dropdown.holder.drawings);dropdown.holder.buttons[#dropdown.holder.buttons + 1] = {dropdown_value, dropdown_value_frame}
+                        end
+                        --
+                        window.currentContent.frame = dropdown_open_inline
+                        window.currentContent.dropdown = dropdown
+                        --
+                        dropdown:Update()
+                    else
+                        dropdown.open = not dropdown.open
+                        utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+                        --
+                        for i,v in pairs(dropdown.holder.drawings) do
+                            utility:Remove(v)
+                        end
+                        --
+                        dropdown.holder.drawings = {}
+                        dropdown.holder.buttons = {}
+                        dropdown.holder.inline = nil
+                        --
+                        window.currentContent.frame = nil
+                        window.currentContent.dropdown = nil
+                    end
+                else
+                    if dropdown.open then
+                        dropdown.open = not dropdown.open
+                        utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
+                        --
+                        for i,v in pairs(dropdown.holder.drawings) do
+                            utility:Remove(v)
+                        end
+                        --
+                        dropdown.holder.drawings = {}
+                        dropdown.holder.buttons = {}
+                        dropdown.holder.inline = nil
+                        --
+                        window.currentContent.frame = nil
+                        window.currentContent.dropdown = nil
+                    end
                 end
-                --
-                window.currentContent.frame = dropdown_open_inline
-                window.currentContent.dropdown = dropdown
-                --
-                dropdown:Update()
-            else
+            elseif Input.UserInputType == Enum.UserInputType.MouseButton1 and dropdown.open then
                 dropdown.open = not dropdown.open
                 utility:LoadImage(dropdown_image, "arrow_down", "https://i.imgur.com/tVqy0nL.png")
                 --
@@ -2971,48 +3063,34 @@ local info = info or {}
                 --
                 dropdown.holder.drawings = {}
                 dropdown.holder.buttons = {}
+                dropdown.holder.inline = nil
                 --
                 window.currentContent.frame = nil
-                window.currentContent.dropdown
-		end
+                window.currentContent.dropdown = nil
+            end
         end
-    end
-    --
-    dropdown_image = utility:Create("ImageLabel", {Vector2.new(18,18), dropdown_outline}, {
-        Size = utility.Size(1, -2, 1, -2, dropdown_outline),
-        Position = utility.Position(0, 1, 0, 1, dropdown_outline),
-        Image = "rbxassetid://8077354740",
-        BackgroundTransparency = 1,
-        ZIndex = 2,
-        Visible = page.open
-    }, dropdown.holder.drawings)
-    --
-    dropdown_value = utility:Create("TextLabel", {Vector2.new(0,0), dropdown_image}, {
-        Text = tostring(def),
-        Size = utility.Size(1, -8, 0, 8, dropdown_image),
-        Position = utility.Position(0, 0, 0, 0, dropdown_image),
-        Color = theme.textcolor,
-        OutlineColor = theme.textborder,
-        Visible = page.open
-    }, dropdown.holder.drawings)
-
-    dropdown:Refresh(options)
-    --
-    function dropdown:Destroy()
-        for i,v in pairs(dropdown.holder.drawings) do
-            utility:Remove(v)
+        --
+        library.changed[#library.changed + 1] = function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseMovement and dropdown_outline.Visible and window.isVisible then
+                if utility:MouseOverDrawing({section.section_frame.Position.X, section.section_frame.Position.Y + dropdown.axis, section.section_frame.Position.X + section.section_frame.Size.X, section.section_frame.Position.Y + dropdown.axis + 15 +  20}) and not window:IsOverContent() then
+                    local h, s, v = theme.accent:ToHSV()
+                    dropdown_inline.Color = Color3.fromHSV(h, 0.44, v)
+                else
+                    dropdown_inline.Color = theme.inline
+                end
+            end
         end
-        dropdown = nil
+        --
+        if pointer and tostring(pointer) ~= "" and tostring(pointer) ~= " " and not library.pointers[tostring(pointer)] then
+            library.pointers[tostring(pointer)] = dropdown
+        end
+        --
+        section.currentAxis = section.currentAxis + 35 + 4
+        section:Update()
+        --
+        return dropdown
     end
     --
-    if pointer then
-        library.pointers[tostring(pointer)] = dropdown
-    end
-    --
-    return dropdown
-end
-
-
     function sections:Multibox(info)
         local info = info or {}
         local name = info.name or info.Name or info.title or info.Title or "New Multibox"
