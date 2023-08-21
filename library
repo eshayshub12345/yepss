@@ -792,16 +792,14 @@ do
 	        local info = info or {}
 	        local text = info.text or "label"
 	        local lifetime = info.lifetime or 5
-	        local screen_size = utility:GetScreenSize()
 	
 	        local notification = {pressed = false}
-	        local notificationHeight = 18 + (7 * #text)
 	
-	        local yPos = screen_size.Y - 10 - (#window.notificationlist.notifications * notificationHeight)
+	       local yPos = -10 - (#window.notificationlist.notifications * 35)
 	
 	        local notify_outline = utility:Create("Frame", {Vector2.new(0, 0)}, {
 	            Size = utility:Size(0, notificationHeight, 0, 29),
-	            Position = utility:Position(0, screen_size.X - notificationHeight - 10, 0, yPos),
+	            Position = utility:Position(1, -10, 1, yPos), 
 	            Color = theme.outline,
 	            ZIndex = 1,
 	            Transparency = 0,
