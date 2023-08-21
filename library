@@ -837,7 +837,7 @@ do
                 })notification["notify_accent"] = notify_accent
                 --
                 local notify_title = utility:Create("TextLabel", {Vector2.new(8, 5), notify_frame}, {
-                    Size = 13,
+                    Size = 14,
                     Position = utility:Position(0, 10, 0, 5, notify_frame),
                     Font = Drawing.Fonts.Plex,
                     Color = theme.textcolor,
