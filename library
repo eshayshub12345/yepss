@@ -798,7 +798,7 @@ do
                 --
                 local notify_outline = utility:Create("Frame", {Vector2.new(0, 0)}, {
                     Size = utility:Size(0, 18 + (7 * #text), 0, 29),
-                    Position = utility:Position(0, 1722, 0, 980 + (#window.notificationlist.notifications * 35)),
+                    Position = utility:Position(0, 1722, 0, 950 - (#window.notificationlist.notifications * 35)),
                     Color = theme.outline,
                     ZIndex = 1,
                     Transparency = 0,
