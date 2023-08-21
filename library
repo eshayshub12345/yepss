@@ -629,54 +629,60 @@ do
         end
         --
         function window:Unload()
-            for i,v in pairs(library.connections) do
-                v:Disconnect()
-            end
-            --
-            for i,v in next, library.hidden do
-                coroutine.wrap(function()
-                    if v[1] then
-                        local instance = v[1]
-                        --
-                        instance:Remove()
-                        library.hidden[i] = nil
-                    end
-                end)()
-            end
-            --
-            for i,v in pairs(library.drawings) do
-                coroutine.wrap(function()
-                    if v[1] ~= nil then
-                        local instance = v[1]
-                        --
-                        instance:Remove()
-                        --
-                        library.drawings[i] = nil
-                    end
-                end)()
-            end
-            --
-            for i,v in pairs(library.began) do
-                v:Disconnect()
-            end
-            --
-            for i,v in pairs(library.ended) do
-                v:Disconnect()
-            end
-            --
-            for i,v in pairs(library.changed) do
-                v:Disconnect()
-            end
-            --
-            library.drawings = nil
-            library.hidden = nil
-            library.connections = nil
-            library.began = nil
-            library.ended = nil
-            library.changed = nil
-            --
-            uis.MouseIconEnabled = true
-        end
+	    for i, v in pairs(library.connections) do
+	        v:Disconnect()
+	    end
+	
+	    for i, v in next, library.hidden do
+	        coroutine.wrap(function()
+	            if v[1] then
+	                local instance = v[1]
+	                instance:Remove()
+	                library.hidden[i] = nil
+	            end
+	        end)()
+	    end
+	    
+	    for i, v in pairs(library.drawings) do
+	        coroutine.wrap(function()
+	            if v[1] ~= nil then
+	                local instance = v[1]
+	                instance:Remove()
+	                library.drawings[i] = nil
+	            end
+	        end)()
+	    end
+	    
+	    for i, v in pairs(library.began) do
+	        v:Disconnect()
+	    end
+	    
+	    for i, v in pairs(library.ended) do
+	        v:Disconnect()
+	    end
+	    
+	    for i, v in pairs(library.changed) do
+	        v:Disconnect()
+	    end
+	    
+	    if window.notificationlist then
+	        for _, notification in ipairs(window.notificationlist.notifications) do
+	            if notification.Remove then
+	                notification:Remove()
+	            end
+	        end
+	        window.notificationlist.notifications = {}
+	    end
+	    
+	    library.drawings = nil
+	    library.hidden = nil
+	    library.connections = nil
+	    library.began = nil
+	    library.ended = nil
+	    library.changed = nil
+	    
+	    uis.MouseIconEnabled = true
+	end
         --
         function window:Watermark(info)
             window.watermark = {visible = false}
