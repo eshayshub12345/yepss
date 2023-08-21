@@ -827,7 +827,7 @@ do
                 })notification["notify_frame"] = notify_frame
                 --
                 local notify_accent = utility:Create("Frame", {Vector2.new(0, 0), notify_frame}, {
-                    Size = utility:Size(0, 5, 0, 25),
+                    Size = utility:Size(0, 2.5, 0, 25),
                     Position = utility:Position(0, 0, 0, 0, notify_frame),
                     Color = theme.accent,
                     ZIndex = 3,
