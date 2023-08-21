@@ -784,7 +784,7 @@ do
         end
         --
 
-	function window.notificationlist(info)
+	function window.NotificationList(info)
 	    window.notificationlist = {notifications = {}}
 	    local info = info or {}
 	
